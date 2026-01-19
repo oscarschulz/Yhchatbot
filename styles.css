@@ -1,0 +1,314 @@
+:root{
+  --bg:#000000;
+  --text:#EAF0FF;
+  --muted:rgba(234,240,255,.65);
+  --line:rgba(234,240,255,.12);
+
+  /* Glass */
+  --glass:rgba(255,255,255,.06);
+  --glass2:rgba(255,255,255,.08);
+  --radius:18px;
+
+  --focus: rgba(100,233,238,.45);
+  --glow: rgba(100,233,238,.15);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+
+body{
+  margin:0;
+  background:#000;
+  color: var(--text);
+  overflow-x:hidden;
+  position: relative;
+}
+
+/* Center watermark icon in the background (behind everything) */
+body::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  background: url("./assets/yh-logo.png") center / 520px no-repeat;
+  opacity: 0.09;
+  filter: blur(0px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle dark vignette (still black-only) */
+body::after{
+  content:"";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(0,0,0,0.20) 0%,
+    rgba(0,0,0,0.62) 58%,
+    rgba(0,0,0,0.92) 100%
+  );
+  pointer-events:none;
+  z-index: 0;
+}
+
+/* Ensure all page content sits above the background layers */
+.wrap{
+  position: relative;
+  z-index: 1;
+  min-height:100vh;
+  max-width:1100px;
+  margin:0 auto;
+  padding:0 18px 22px;
+  display:flex;
+  flex-direction:column;
+}
+
+/* HERO centered vertically + horizontally */
+.top{
+  flex: 1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  text-align:center;
+  padding: 18px 0;
+}
+
+.headline{
+  margin:0;
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:-.3px;
+}
+
+.subhead{
+  margin:0;
+  font-size:13px;
+  color: var(--muted);
+  line-height:1.5;
+  max-width: 640px;
+}
+
+/* Search container (glass) */
+.searchCard{
+  width:min(820px, 100%);
+  padding:14px;
+  border-radius: var(--radius);
+  background: var(--glass);
+  border:1px solid var(--line);
+  box-shadow: 0 26px 60px rgba(0,0,0,.6);
+  backdrop-filter: blur(12px);
+  margin-top: 8px;
+}
+
+/* input + go button in same row */
+.searchRow{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+input{
+  width:100%;
+  height:48px;
+  padding:0 14px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  outline:none;
+  background: rgba(0,0,0,.35);
+  color:var(--text);
+  font-size:14px;
+}
+
+input:focus{
+  border-color: var(--focus);
+  box-shadow: 0 0 0 4px var(--glow);
+}
+
+/* GO button */
+.goBtn{
+  height:48px;
+  width:48px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background: rgba(0,0,0,.35);
+  color: var(--text);
+  cursor:pointer;
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  transition: transform .08s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.goBtn:hover{
+  background: rgba(255,255,255,.06);
+  border-color: var(--focus);
+  box-shadow: 0 0 0 4px var(--glow);
+}
+
+.goBtn:active{
+  transform: translateY(1px);
+}
+
+.goIcon{
+  font-size:22px;
+  line-height:1;
+  transform: translateX(1px);
+}
+
+/* Enter hint */
+.hintRow{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  margin-top:10px;
+  color: var(--muted);
+  font-size:12px;
+}
+
+.kbd{
+  padding:3px 8px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background: rgba(0,0,0,.25);
+  color: rgba(234,240,255,.8);
+  font-size:11px;
+}
+
+.content{
+  width:min(820px, 100%);
+  margin: 12px auto 0;
+}
+
+.list{
+  display:grid;
+  gap:12px;
+}
+
+/* Results cards (only show when typing/searching) */
+.card{
+  border-radius: var(--radius);
+  background: var(--glass);
+  border:1px solid var(--line);
+  overflow:hidden;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 18px 45px rgba(0,0,0,.55);
+}
+
+.cardHead{
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  cursor:pointer;
+}
+
+.cardHead:hover{
+  background: var(--glass2);
+}
+
+.qTitle{
+  margin:0;
+  font-size:15px;
+  letter-spacing:-.1px;
+}
+
+.chev{
+  width:34px; height:34px;
+  border-radius:12px;
+  display:grid; place-items:center;
+  border:1px solid var(--line);
+  background: rgba(0,0,0,.25);
+  flex:0 0 auto;
+}
+
+.answer{
+  padding:0 16px 14px;
+  color: rgba(234,240,255,.85);
+  line-height:1.55;
+  font-size:13.8px;
+  display:none;
+}
+
+.card.open .answer{ display:block; }
+
+.empty{
+  padding:14px 16px;
+  border-radius: var(--radius);
+  border:1px solid var(--line);
+  background: var(--glass);
+  color: var(--muted);
+  text-align:center;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 18px 45px rgba(0,0,0,.55);
+}
+
+.hidden{ display:none; }
+
+.footer{
+  margin-top:auto;
+  padding-top:16px;
+  border-top:1px solid rgba(234,240,255,.10);
+  color:var(--muted);
+  font-size:12px;
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.dot{opacity:.6}
+
+@media (max-width:640px){
+  .wrap{padding:0 14px 18px}
+  .headline{font-size:22px}
+  .subhead{font-size:12px}
+
+  /* smaller watermark on mobile */
+  body::before{
+    background-size: 320px;
+    opacity: 0.10;
+  }
+}
+/* === TYPOGRAPHY BOOST (slightly larger) === */
+.headline{
+  font-size: 32px; /* was 28px */
+}
+
+.subhead{
+  font-size: 15px; /* was 13px */
+}
+
+input{
+  font-size: 15.5px; /* was 14px */
+}
+
+.hintRow{
+  font-size: 13px; /* was 12px */
+}
+
+.kbd{
+  font-size: 12px; /* was 11px */
+}
+
+.footer{
+  font-size: 13px; /* was 12px */
+}
+
+/* If you show results later, make them a bit bigger too */
+.qTitle{
+  font-size: 16.5px; /* was 15px */
+}
+
+.answer{
+  font-size: 14.8px; /* was 13.8px */
+}
+
+/* Mobile scaling */
+@media (max-width:640px){
+  .headline{ font-size: 24px; } /* was 22px */
+  .subhead{ font-size: 13px; }  /* was 12px */
+  input{ font-size: 15px; }
+}
