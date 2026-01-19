@@ -1,8 +1,8 @@
 :root{
   --bg:#000000;
-  --text:#EAF0FF;
-  --muted:rgba(234,240,255,.65);
-  --line:rgba(234,240,255,.12);
+  --text:#F7FAFF;
+  --muted:rgba(247,250,255,.82);
+  --line:rgba(247,250,255,.16);
 
   /* Glass */
   --glass:rgba(255,255,255,.06);
@@ -18,7 +18,12 @@ html,body{height:100%}
 
 body{
   margin:0;
-  background:#000;
+  /* Full-page background image (from: ./assets/yhbanner.png) */
+  background-color:#000;
+  background-image: url("./assets/yhbanner.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
   color: var(--text);
   overflow-x:hidden;
   position: relative;
@@ -274,15 +279,16 @@ input:focus{
 }
 /* === TYPOGRAPHY BOOST (slightly larger) === */
 .headline{
-  font-size: 32px; /* was 28px */
+  font-size: 46px;
+  line-height: 1.12;
 }
 
 .subhead{
-  font-size: 15px; /* was 13px */
+  font-size: 20px;
 }
 
 input{
-  font-size: 15.5px; /* was 14px */
+  font-size: 16px; /* was 14px */
 }
 
 .hintRow{
@@ -308,7 +314,39 @@ input{
 
 /* Mobile scaling */
 @media (max-width:640px){
-  .headline{ font-size: 24px; } /* was 22px */
-  .subhead{ font-size: 13px; }  /* was 12px */
-  input{ font-size: 15px; }
+  .headline{ font-size: 32px; }
+  .subhead{ font-size: 16px; }
+}
+
+
+/* === READABILITY BOOST === */
+
+/* Make key texts pop against bright areas of the background image */
+.headline{
+  color: rgba(255,255,255,.98);
+  text-shadow:
+    0 2px 18px rgba(0,0,0,.75),
+    0 0 28px rgba(0,0,0,.35);
+}
+
+.subhead{
+  color: rgba(255,255,255,.88);
+  text-shadow: 0 1px 12px rgba(0,0,0,.70);
+}
+
+.hintRow,
+.footer{
+  color: rgba(255,255,255,.82);
+  text-shadow: 0 1px 10px rgba(0,0,0,.65);
+}
+
+/* Make placeholder text clearer */
+input::placeholder{
+  color: rgba(255,255,255,.70);
+}
+
+/* Slightly stronger input contrast on busy backgrounds */
+input,
+.goBtn{
+  background: rgba(0,0,0,.45);
 }
