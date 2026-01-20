@@ -4,38 +4,45 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ask YH</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <main class="wrap">
-    <header class="top">
-      <h1 class="headline">Who are you looking for?</h1>
-      <p class="subhead">You are 5 handshakes away from anyone in this world, start here.</p>
+    <div class="mainContent">
+      <header class="top">
+        <h1 class="headline">Who are you looking for?</h1>
+        <p class="subhead">You are 5 handshakes away from anyone in this world, start here.</p>
 
-      <div class="searchCard">
-        <div class="searchRow">
-          <input
-            id="q"
-            type="text"
-            placeholder='Try: "Amazon employee", "Politician in California", "Elon Musk" etc.'
-            autocomplete="off"
-          />
-          <button id="goBtn" class="goBtn" type="button" aria-label="Search">
-            <span class="goIcon">›</span>
-          </button>
+        <div class="searchCard">
+          <div class="searchRow">
+            <input
+              id="q"
+              type="text"
+              placeholder='Try: "What is Young Hustlers?"'
+              autocomplete="off"
+            />
+            <button id="goBtn" class="goBtn" type="button" aria-label="Search">
+              <span class="goIcon">›</span>
+            </button>
+          </div>
+
+          <div class="hintRow">
+            <span class="kbd">Enter</span>
+            <span class="hintText">to search</span>
+          </div>
         </div>
+      </header>
 
-        <div class="hintRow">
-          <span class="kbd">Enter</span>
-          <span class="hintText">to search</span>
-        </div>
-      </div>
-    </header>
-
-    <section class="content">
-      <div id="list" class="list hidden"></div>
-      <div id="empty" class="empty hidden">No matches found.</div>
-    </section>
+      <section class="content">
+        <div id="list" class="list hidden"></div>
+        <div id="empty" class="empty hidden">No matches found.</div>
+      </section>
+    </div>
 
     <footer class="footer">
       <span>© Young Hustlers</span>
