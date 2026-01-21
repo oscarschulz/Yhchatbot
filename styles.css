@@ -1,303 +1,363 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
 :root{
   --bg:#000000;
   --text:#EAF0FF;
-  --muted:rgba(234,240,255,.70);
-  --muted2:rgba(234,240,255,.55);
+  --muted:rgba(234,240,255,.65);
   --line:rgba(234,240,255,.12);
 
   /* Glass */
   --glass:rgba(255,255,255,.06);
   --glass2:rgba(255,255,255,.08);
-  --panel:rgba(10,12,16,.56);
-  --panel2:rgba(10,12,16,.44);
   --radius:18px;
 
   --focus: rgba(100,233,238,.45);
   --glow: rgba(100,233,238,.15);
-  --shadow: 0 18px 45px rgba(0,0,0,.55);
 }
 
-*{box-sizing:border-box}
-html,body{height:100%}
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
 
 body{
   margin:0;
-  font-family: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background:#000;
   color: var(--text);
-
-  /* Background image + subtle dark overlay (less dim than before) */
-  background-color: var(--bg);
-  background-image:
-    linear-gradient(rgba(0,0,0,.18), rgba(0,0,0,.18)),
-    url("assets/yhbanner.png");
-  background-position: center, center;
-  background-size: cover, cover;
-  background-repeat: no-repeat, no-repeat;
-  background-attachment: fixed, fixed;
-
   overflow-x:hidden;
   position: relative;
+  font-family: 'Roboto', Arial, sans-serif;
 }
 
-/* Center watermark icon in the background (behind everything) */
+h1{
+  font-size: clamp(40px, 5vw, 72px);
+  line-height: 1.05;
+}
+
+input, button, textarea, select{
+  font-family: 'Roboto', Arial, sans-serif;
+}
+
+/* Background image (keep opacity = 1 as requested) */
 body::before{
   content:"";
   position: fixed;
   inset: 0;
-  background: url("assets/yh-logo.png") center / 520px no-repeat;
-  opacity: 0.09;
+  background: url("./assets/yhbanner.png") center / 1900px no-repeat;
+  opacity: 1;
+  filter: blur(0px);
   pointer-events: none;
   z-index: 0;
 }
 
-/* Dark vignette to frame the hero */
+/* Vignette */
 body::after{
   content:"";
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at 50% 35%, rgba(0,0,0,0) 60%, rgba(0,0,0,.45) 92%);
-  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    rgba(0,0,0,0.20) 0%,
+    rgba(0,0,0,0.62) 58%,
+    rgba(0,0,0,0.92) 100%
+  );
+  pointer-events:none;
   z-index: 0;
 }
 
+/* Layout wrapper */
 .wrap{
   position: relative;
   z-index: 1;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0 18px 18px;
+  min-height:100vh;
+  max-width:1100px;
+  margin:0 auto;
+  padding:0 18px 22px;
+  display:flex;
+  flex-direction:column;
 }
 
-/* This keeps hero content centered and lets footer stay at bottom */
-.mainContent{
-  width: 100%;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Move the hero down so the top of the background stays visible */
+/* Hero */
 .top{
-  width: min(980px, 100%);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transform: translateY(70px);
+  flex: 1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  text-align:center;
+  padding: 18px 0;
 }
 
 .headline{
-  margin: 0 0 10px;
-  font-size: 54px;
-  line-height: 1.08;
-  font-weight: 600;
-  letter-spacing: -.02em;
-  text-shadow: 0 10px 30px rgba(0,0,0,.65);
+  margin:0;
+  font-weight:800;
+  letter-spacing:-.3px;
+  font-size: 50px; /* bigger */
 }
 
 .subhead{
-  margin: 0 auto 24px;
-  max-width: 820px;
-  font-size: 20px;
-  line-height: 1.45;
-  font-weight: 400;
+  margin:0;
   color: var(--muted);
-  text-shadow: 0 10px 26px rgba(0,0,0,.55);
+  line-height:1.5;
+  max-width: 640px;
+  font-size: 22px; /* bigger */
 }
 
+/* Search card */
 .searchCard{
-  width: min(860px, 100%);
-  margin: 0 auto;
-  padding: 16px 16px 12px;
-  border-radius: 22px;
-  background: var(--panel);
-  border: 1px solid var(--line);
+  width:min(820px, 100%);
+  padding:14px;
+  border-radius: var(--radius);
+  background: var(--glass);
+  border:1px solid var(--line);
+  box-shadow: 0 26px 60px rgba(0,0,0,.6);
   backdrop-filter: blur(12px);
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  margin-top: 15px;
 }
 
 .searchRow{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
-#q{
-  flex: 1;
-  height: 48px;
-  padding: 0 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: var(--panel2);
-  color: var(--text);
-  font-family: inherit;
-  font-size: 16px;
-  outline: none;
-  transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+input{
+  width:100%;
+  height:48px;
+  padding:0 14px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  outline:none;
+  background: rgba(0,0,0,.35);
+  color:var(--text);
+  font-size: 15.5px; /* bigger */
 }
 
-#q::placeholder{ color: rgba(255,255,255,.55); }
-
-#q:focus{
+input:focus{
   border-color: var(--focus);
   box-shadow: 0 0 0 4px var(--glow);
-  background: rgba(10,12,16,.58);
 }
 
+/* Go button */
 .goBtn{
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  background: rgba(255,255,255,.06);
+  height:48px;
+  width:48px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background: rgba(0,0,0,.35);
   color: var(--text);
-  cursor: pointer;
-  flex: 0 0 auto;
+  cursor:pointer;
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
   transition: transform .08s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
 }
 
 .goBtn:hover{
-  background: rgba(255,255,255,.08);
+  background: rgba(255,255,255,.06);
   border-color: var(--focus);
   box-shadow: 0 0 0 4px var(--glow);
 }
 
-.goBtn:active{ transform: translateY(1px); }
+.goBtn:active{
+  transform: translateY(1px);
+}
 
 .goIcon{
-  font-size: 22px;
-  line-height: 1;
+  font-size:22px;
+  line-height:1;
   transform: translateX(1px);
 }
 
+/* Hint row */
 .hintRow{
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
-  margin-top: 10px;
+  display:flex;
+  gap:8px;
+  align-items:center;
+  margin-top:10px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 13px; /* bigger */
 }
 
 .kbd{
-  padding: 3px 8px;
-  border-radius: 10px;
-  border: 1px solid var(--line);
+  padding:3px 8px;
+  border-radius:10px;
+  border:1px solid var(--line);
   background: rgba(0,0,0,.25);
-  color: rgba(234,240,255,.82);
-  font-size: 12px;
+  color: rgba(234,240,255,.8);
+  font-size: 12px; /* bigger */
 }
 
-/* Results */
+/* Results area */
 .content{
-  width: min(820px, 100%);
-  margin: 14px auto 0;
+  width:min(820px, 100%);
+  margin: 12px auto 0;
 }
 
-.list{ display: grid; gap: 12px; }
+.list{
+  display:grid;
+  gap:12px;
+}
 
 .card{
   border-radius: var(--radius);
   background: var(--glass);
-  border: 1px solid var(--line);
-  overflow: hidden;
+  border:1px solid var(--line);
+  overflow:hidden;
   backdrop-filter: blur(12px);
-  box-shadow: var(--shadow);
+  box-shadow: 0 18px 45px rgba(0,0,0,.55);
 }
 
 .cardHead{
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  cursor:pointer;
 }
 
-.cardHead:hover{ background: var(--glass2); }
+.cardHead:hover{
+  background: var(--glass2);
+}
 
 .qTitle{
-  margin: 0;
-  font-size: 16.5px;
-  letter-spacing: -.1px;
+  margin:0;
+  letter-spacing:-.1px;
+  font-size: 16.5px; /* bigger */
 }
 
 .chev{
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--line);
+  width:34px; height:34px;
+  border-radius:12px;
+  display:grid; place-items:center;
+  border:1px solid var(--line);
   background: rgba(0,0,0,.25);
-  flex: 0 0 auto;
+  flex:0 0 auto;
 }
 
 .answer{
-  padding: 0 16px 14px;
+  padding:0 16px 14px;
   color: rgba(234,240,255,.85);
-  line-height: 1.55;
-  font-size: 14.8px;
-  display: none;
-  white-space: pre-wrap;
+  line-height:1.55;
+  display:none;
+  font-size: 14.8px; /* bigger */
 }
 
-.card.open .answer{ display: block; }
+.card.open .answer{ display:block; }
 
 .empty{
-  padding: 14px 16px;
+  padding:14px 16px;
   border-radius: var(--radius);
-  border: 1px solid var(--line);
+  border:1px solid var(--line);
   background: var(--glass);
   color: var(--muted);
-  text-align: center;
+  text-align:center;
   backdrop-filter: blur(12px);
-  box-shadow: var(--shadow);
+  box-shadow: 0 18px 45px rgba(0,0,0,.55);
 }
 
-.hidden{ display: none; }
+.hidden{ display:none; }
 
+/* Footer */
 .footer{
-  padding: 16px 0 10px;
-  border-top: 1px solid rgba(234,240,255,.10);
-  color: var(--muted);
-  font-size: 13px;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
+  margin-top:auto;
+  padding-top:16px;
+  border-top:1px solid rgba(234,240,255,.10);
+  color:var(--muted);
+  font-size: 13px; /* bigger */
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.dot{ opacity:.6; }
+
+/* ===== Form UI (same font + spacing + premium submit) ===== */
+
+/* Ensure form controls inherit page typography */
+input, button, select, textarea{
+  font: inherit;
+}
+
+/* Add spacing between last field and submit */
+#connectForm{
+  margin-top: 10px;
+}
+
+#connectForm .field:last-of-type{
+  margin-bottom: 14px;
+}
+
+/* If your fields are not wrapped in .field, this still adds space before submit */
+#connectForm button[type="submit"]{
+  display: inline-flex;
   align-items: center;
-  flex-wrap: wrap;
-  width: 100%;
+  justify-content: center;
+  margin-top: 14px; /* gap from last input */
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.22);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+  transition: transform .12s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
 
-.dot{ opacity: .6; }
-
-@media (max-width: 640px){
-  body::before{ background-size: 320px; opacity: 0.10; }
-
-  .wrap{ padding: 0 14px 18px; }
-  .top{ transform: translateY(42px); }
-
-  .headline{ font-size: 34px; }
-  .subhead{ font-size: 15px; }
-  #q{ font-size: 15px; }
-}
-/* 1) Bigyan ng space yung search bar card */
-.searchCard{
-  margin-bottom: 24px; /* adjust: 16–48px */
+#connectForm button[type="submit"]:hover{
+  background: rgba(0,0,0,0.30);
+  border-color: rgba(255,255,255,0.28);
+  box-shadow: 0 18px 38px rgba(0,0,0,0.42);
+  transform: translateY(-1px);
 }
 
-/* 2) Bigyan ng extra space yung results container */
-#results,
-.results,
-.content{
-  margin-top: 24px; /* adjust: 16–48px */
+#connectForm button[type="submit"]:active{
+  transform: translateY(0);
+}
+
+#connectForm button[type="submit"]:focus-visible{
+  outline: 2px solid rgba(120,200,255,0.70);
+  outline-offset: 2px;
+}
+
+/* Disabled/loading state */
+#connectForm button[type="submit"][disabled]{
+  opacity: 0.72;
+  cursor: not-allowed;
+  transform: none;
+}
+
+#connectForm button[type="submit"].is-loading{
+  pointer-events: none;
+}
+
+#connectForm button[type="submit"].is-loading::after{
+  content: "";
+  width: 14px;
+  height: 14px;
+  margin-left: 10px;
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: rgba(255,255,255,0.85);
+  animation: askYHSpin .9s linear infinite;
+}
+
+@keyframes askYHSpin{
+  to{ transform: rotate(360deg); }
+}
+
+/* Mobile tweaks */
+@media (max-width:640px){
+  .wrap{ padding:0 14px 18px; }
+  .headline{ font-size: 24px; }
+  .subhead{ font-size: 13px; }
+  input{ font-size: 15px; }
+
+  body::before{
+    background-size: 320px;
+    opacity: 1; /* keep at 1 per your instruction */
+  }
 }

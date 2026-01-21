@@ -4,45 +4,86 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ask YH</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <main class="wrap">
-    <div class="mainContent">
-      <header class="top">
-        <h1 class="headline">Who are you looking for?</h1>
-        <p class="subhead">You are 5 handshakes away from anyone in this world, start here.</p>
+    <header class="top">
+      <h1 class="headline">Who are you looking for?</h1>
+      <p class="subhead">You are 5 handshakes away from anyone in this world, start here.</p>
 
-        <div class="searchCard">
-          <div class="searchRow">
-            <input
-              id="q"
-              type="text"
-              placeholder='Try: "What is Young Hustlers?"'
-              autocomplete="off"
-            />
-            <button id="goBtn" class="goBtn" type="button" aria-label="Search">
-              <span class="goIcon">›</span>
-            </button>
-          </div>
-
-          <div class="hintRow">
-            <span class="kbd">Enter</span>
-            <span class="hintText">to search</span>
-          </div>
+      <div class="searchCard">
+        <div class="searchRow">
+          <input
+            id="q"
+            type="text"
+            placeholder='Try: "Amazon employee", "Politician in California", "Elon Musk" etc.'
+            autocomplete="off"
+          />
+          <button id="goBtn" class="goBtn" type="button" aria-label="Search">
+            <span class="goIcon">›</span>
+          </button>
         </div>
-      </header>
 
-      <section class="content">
-        <div id="list" class="list hidden"></div>
-        <div id="empty" class="empty hidden">No matches found.</div>
-      </section>
-    </div>
+        <div class="hintRow">
+          <span class="kbd">Enter</span>
+          <span class="hintText">to search</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="content">
+      <!-- Shown only when a visitor asks about a specific individual -->
+      <div id="personBox" class="card hidden open">
+        <div class="cardHead" id="personHead">
+          <h3 class="qTitle">Connection request</h3>
+          <div class="chev">▾</div>
+        </div>
+        <div class="answer">
+          <p id="personMsg">We might be able to connect you with him, but firstly, fill this form out.</p>
+
+          <form id="connectForm" autocomplete="off">
+            <label>
+              Name
+              <input name="firstName" type="text" required />
+            </label>
+
+            <label>
+              Surname
+              <input name="surname" type="text" required />
+            </label>
+
+            <label>
+              Age
+              <input name="age" type="number" min="1" step="1" required />
+            </label>
+
+            <label>
+              Birthdate
+              <input name="birthdate" type="date" required />
+            </label>
+
+            <label>
+              Country of residency
+              <input name="country" type="text" required />
+            </label>
+
+            <label>
+              Current location / city
+              <input name="city" type="text" required />
+            </label>
+
+            <button type="submit">Submit</button>
+            <div id="connectStatus" class="hintRow hidden">
+              Submitted. If we can connect you, we’ll follow up.
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="list" class="list hidden"></div>
+      <div id="empty" class="empty hidden">No matches found.</div>
+    </section>
 
     <footer class="footer">
       <span>© Young Hustlers</span>
