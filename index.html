@@ -32,8 +32,8 @@
       </div>
     </header>
 
+    
     <section class="content">
-      <!-- Shown only when a visitor asks about a specific individual -->
       <div id="personBox" class="card hidden open">
         <div class="cardHead" id="personHead">
           <h3 class="qTitle">Connection request</h3>
@@ -54,6 +54,11 @@
             </label>
 
             <label>
+              Email Address
+              <input name="email" type="email" required placeholder="name@example.com" />
+            </label>
+
+            <label>
               Age
               <input name="age" type="number" min="1" step="1" required />
             </label>
@@ -71,6 +76,16 @@
             <label>
               Current location / city
               <input name="city" type="text" required />
+            </label>
+
+            <label>
+              Profession
+              <input name="profession" type="text" required placeholder="e.g. Software Engineer, Student..." />
+            </label>
+
+            <label>
+              Past Experience/s
+              <textarea name="experience" rows="3" required placeholder="Briefly list your relevant past experiences..."></textarea>
             </label>
 
             <button type="submit">Submit</button>

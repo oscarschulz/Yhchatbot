@@ -36,7 +36,7 @@ input, button, textarea, select{
   font-family: 'Roboto', Arial, sans-serif;
 }
 
-/* Background image (keep opacity = 1 as requested) */
+/* Background image */
 body::before{
   content:"";
   position: fixed;
@@ -91,7 +91,7 @@ body::after{
   margin:0;
   font-weight:800;
   letter-spacing:-.3px;
-  font-size: 50px; /* bigger */
+  font-size: 50px;
 }
 
 .subhead{
@@ -99,7 +99,7 @@ body::after{
   color: var(--muted);
   line-height:1.5;
   max-width: 640px;
-  font-size: 22px; /* bigger */
+  font-size: 22px;
 }
 
 /* Search card */
@@ -129,10 +129,29 @@ input{
   outline:none;
   background: rgba(0,0,0,.35);
   color:var(--text);
-  font-size: 15.5px; /* bigger */
+  font-size: 15.5px;
 }
 
 input:focus{
+  border-color: var(--focus);
+  box-shadow: 0 0 0 4px var(--glow);
+}
+
+/* Specific styling for Textarea to match Input */
+textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  outline: none;
+  background: rgba(0,0,0,.35);
+  color: var(--text);
+  font-size: 15.5px;
+  resize: vertical;
+}
+
+textarea:focus {
   border-color: var(--focus);
   box-shadow: 0 0 0 4px var(--glow);
 }
@@ -175,7 +194,7 @@ input:focus{
   align-items:center;
   margin-top:10px;
   color: var(--muted);
-  font-size: 13px; /* bigger */
+  font-size: 13px;
 }
 
 .kbd{
@@ -184,7 +203,7 @@ input:focus{
   border:1px solid var(--line);
   background: rgba(0,0,0,.25);
   color: rgba(234,240,255,.8);
-  font-size: 12px; /* bigger */
+  font-size: 12px;
 }
 
 /* Results area */
@@ -222,7 +241,7 @@ input:focus{
 .qTitle{
   margin:0;
   letter-spacing:-.1px;
-  font-size: 16.5px; /* bigger */
+  font-size: 16.5px;
 }
 
 .chev{
@@ -239,7 +258,7 @@ input:focus{
   color: rgba(234,240,255,.85);
   line-height:1.55;
   display:none;
-  font-size: 14.8px; /* bigger */
+  font-size: 14.8px;
 }
 
 .card.open .answer{ display:block; }
@@ -263,7 +282,7 @@ input:focus{
   padding-top:16px;
   border-top:1px solid rgba(234,240,255,.10);
   color:var(--muted);
-  font-size: 13px; /* bigger */
+  font-size: 13px;
   display:flex;
   gap:10px;
   justify-content:center;
@@ -273,11 +292,19 @@ input:focus{
 
 .dot{ opacity:.6; }
 
-/* ===== Form UI (same font + spacing + premium submit) ===== */
+/* ===== Form UI ===== */
 
-/* Ensure form controls inherit page typography */
-input, button, select, textarea{
-  font: inherit;
+label {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+label input, label textarea {
+  display: block;
+  margin-top: 6px;
 }
 
 /* Add spacing between last field and submit */
@@ -285,16 +312,11 @@ input, button, select, textarea{
   margin-top: 10px;
 }
 
-#connectForm .field:last-of-type{
-  margin-bottom: 14px;
-}
-
-/* If your fields are not wrapped in .field, this still adds space before submit */
 #connectForm button[type="submit"]{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: 14px; /* gap from last input */
+  margin-top: 14px;
   padding: 12px 18px;
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.18);
@@ -349,15 +371,14 @@ input, button, select, textarea{
   to{ transform: rotate(360deg); }
 }
 
-/* Mobile tweaks */
 @media (max-width:640px){
   .wrap{ padding:0 14px 18px; }
   .headline{ font-size: 24px; }
   .subhead{ font-size: 13px; }
-  input{ font-size: 15px; }
+  input, textarea{ font-size: 15px; }
 
   body::before{
     background-size: 320px;
-    opacity: 1; /* keep at 1 per your instruction */
+    opacity: 1;
   }
 }
