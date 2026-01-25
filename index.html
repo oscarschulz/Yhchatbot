@@ -7,6 +7,17 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- Go to Homepage (upper-right) -->
+  <a
+    id="homeBtn"
+    class="home-nav-btn"
+    href="https://younghustlers.net/"
+    target="_top"
+    rel="noopener"
+  >
+    Go to Homepage ›
+  </a>
+
   <main class="wrap">
     <header class="top">
       <h1 class="headline">Who are you looking for?</h1>
@@ -32,7 +43,6 @@
       </div>
     </header>
 
-    
     <section class="content">
       <div id="personBox" class="card hidden open">
         <div class="cardHead" id="personHead">
@@ -43,50 +53,15 @@
           <p id="personMsg">We might be able to connect you with him, but firstly, fill this form out.</p>
 
           <form id="connectForm" autocomplete="off">
-            <label>
-              Name
-              <input name="firstName" type="text" required />
-            </label>
-
-            <label>
-              Surname
-              <input name="surname" type="text" required />
-            </label>
-
-            <label>
-              Email Address
-              <input name="email" type="email" required placeholder="name@example.com" />
-            </label>
-
-            <label>
-              Age
-              <input name="age" type="number" min="1" step="1" required />
-            </label>
-
-            <label>
-              Birthdate
-              <input name="birthdate" type="date" required />
-            </label>
-
-            <label>
-              Country of residency
-              <input name="country" type="text" required />
-            </label>
-
-            <label>
-              Current location / city
-              <input name="city" type="text" required />
-            </label>
-
-            <label>
-              Profession
-              <input name="profession" type="text" required placeholder="e.g. Software Engineer, Student..." />
-            </label>
-
-            <label>
-              Past Experience/s
-              <textarea name="experience" rows="3" required placeholder="Briefly list your relevant past experiences..."></textarea>
-            </label>
+            <label>Name <input name="firstName" type="text" required /></label>
+            <label>Surname <input name="surname" type="text" required /></label>
+            <label>Email Address <input name="email" type="email" required placeholder="name@example.com" /></label>
+            <label>Age <input name="age" type="number" min="1" step="1" required /></label>
+            <label>Birthdate <input name="birthdate" type="date" required /></label>
+            <label>Country of residency <input name="country" type="text" required /></label>
+            <label>Current location / city <input name="city" type="text" required /></label>
+            <label>Profession <input name="profession" type="text" required placeholder="e.g. Software Engineer, Student..." /></label>
+            <label>Past Experience/s <textarea name="experience" rows="3" required placeholder="Briefly list your relevant past experiences..."></textarea></label>
 
             <button type="submit">Submit</button>
             <div id="connectStatus" class="hintRow hidden">
