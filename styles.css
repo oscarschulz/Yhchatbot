@@ -38,7 +38,7 @@ input, button, textarea, select{
 .home-nav-btn{
   position: fixed;
   top: 16px;
-  right: 16px;
+  right: 200px;
   z-index: 10;
   padding: 10px 14px;
   border-radius: 12px;
@@ -427,4 +427,13 @@ label input, label textarea {
   .subhead{ font-size: 16px; max-width: 560px; }
   .top{ min-height: max(320px, calc(100vh - var(--wrap-pad-top) - var(--wrap-pad-bottom))); }
   .searchCard{ margin-top: 10px; }
+}
+/* Hide scrollbar but keep scroll */
+body{
+  -ms-overflow-style: none;   /* IE/Edge legacy */
+  scrollbar-width: none;      /* Firefox */
+}
+body::-webkit-scrollbar{
+  width: 0;
+  height: 0;
 }
