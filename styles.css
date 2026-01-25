@@ -541,3 +541,37 @@ body::-webkit-scrollbar{
     height: -webkit-fill-available;
   }
 }
+/* =========================
+   MOBILE: push content lower
+   (append at END of styles.css)
+   ========================= */
+
+@media (max-width: 640px) {
+  /* give the whole page a bit more breathing room */
+  :root{
+    --wrap-pad-top: 22px;
+    --wrap-pad-bottom: 18px;
+  }
+
+  /* instead of centering vertically, start from top with extra top padding */
+  .top{
+    justify-content: flex-start;
+    padding-top: calc(env(safe-area-inset-top) + 52px);
+    padding-bottom: 14px;
+
+    /* optional: keep it tall enough while still allowing scroll content below */
+    min-height: calc(100svh - 120px);
+  }
+
+  /* spacing tweaks so headline + card sit lower and cleaner */
+  .headline{ margin-top: 0; }
+  .subhead{ margin-top: 10px; }
+  .searchCard{ margin-top: 18px; }
+}
+
+/* If very short screens (or when Safari UI eats height), reduce the top push slightly */
+@media (max-width: 640px) and (max-height: 700px) {
+  .top{
+    padding-top: calc(env(safe-area-inset-top) + 34px);
+  }
+}
