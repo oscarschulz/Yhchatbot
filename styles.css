@@ -437,3 +437,107 @@ body::-webkit-scrollbar{
   width: 0;
   height: 0;
 }
+
+/* ===========================
+   MOBILE OVERRIDES (APPEND)
+   =========================== */
+
+/* General mobile (phones + small tablets) */
+@media (max-width: 640px) {
+
+  /* iOS/Safari viewport fix: use "small viewport height" */
+  body{
+    min-height: 100svh;
+  }
+
+  /* Give breathing room + avoid content sitting too low */
+  .wrap{
+    /* keep it comfortable on phones */
+    --wrap-pad-top: 64px;   /* space for the fixed "Go to Homepage" button */
+    --wrap-pad-bottom: 16px;
+    padding: var(--wrap-pad-top) 14px var(--wrap-pad-bottom);
+  }
+
+  .top{
+    /* use svh so iPhones don't add extra hidden height */
+    min-height: calc(100svh - var(--wrap-pad-top) - var(--wrap-pad-bottom));
+    justify-content: flex-start;
+    padding-top: 10px;
+  }
+
+  /* FIX: your current mobile rule sets background-size: 320px (causes big empty black space).
+     Override it back to cover and adjust position for better framing. */
+  body::before{
+    background-size: cover;
+    background-position: center 22%;
+    opacity: 1;
+  }
+
+  /* Make the fixed button safer + more consistent on small widths */
+  .home-nav-btn{
+    top: 12px;
+    right: 12px;
+    padding: 10px 12px;
+    font-size: 13px;
+    border-radius: 12px;
+  }
+
+  /* Typography tweaks */
+  .headline{
+    font-size: 22px;
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+
+  .subhead{
+    font-size: 12.5px;
+    line-height: 1.45;
+    max-width: 34ch;
+  }
+
+  /* Card spacing/shape */
+  .searchCard{
+    margin-top: 16px;
+    padding: 12px 12px 14px;
+    border-radius: 18px;
+  }
+
+  /* Chips wrap better on phones */
+  .hintRow{
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .hint{
+    font-size: 12px;
+    padding: 7px 10px;
+  }
+}
+
+/* Very small phones (iPhone width range) */
+@media (max-width: 420px) {
+  /* Stack input + button so it never feels cramped */
+  .searchRow{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  #goBtn{
+    width: 100%;
+    height: 44px;
+    border-radius: 14px;
+  }
+
+  .searchInput{
+    padding: 12px 14px;
+  }
+}
+
+/* iOS fallback: helps Safari treat height correctly in some cases */
+@supports (-webkit-touch-callout: none) {
+  html, body{
+    height: -webkit-fill-available;
+  }
+}
