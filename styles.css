@@ -35,18 +35,40 @@ h1{
 input, button, textarea, select{
   font-family: 'Roboto', Arial, sans-serif;
 }
+.home-nav-btn{
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(0,0,0,.35);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13px;
+  backdrop-filter: blur(12px);
+  transition: transform .12s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.home-nav-btn:hover{
+  border-color: var(--focus);
+  box-shadow: 0 0 0 4px var(--glow);
+  transform: translateY(-1px);
+}
 
 /* Background image */
 body::before{
   content:"";
   position: fixed;
   inset: 0;
-  background: url("./assets/yhbanner.png") center / 1900px no-repeat;
+  background: url("./assets/yhbanner.png") center / cover no-repeat;
   opacity: 1;
   filter: blur(0px);
   pointer-events: none;
   z-index: 0;
 }
+
 
 /* Vignette */
 body::after{
@@ -67,25 +89,36 @@ body::after{
 .wrap{
   position: relative;
   z-index: 1;
-  min-height:100vh;
+  /* IMPORTANT: don't force full viewport height inside iframes */
+  min-height: auto;
   max-width:1100px;
   margin:0 auto;
-  padding:0 18px 22px;
+  /* padding vars so hero can be vertically centered reliably across breakpoints */
+  --wrap-pad-top: 64px;
+  --wrap-pad-bottom: 22px;
+  padding: var(--wrap-pad-top) 18px var(--wrap-pad-bottom); /* top padding gives space for the Home button */
   display:flex;
   flex-direction:column;
 }
 
 /* Hero */
 .top{
-  flex: 1;
+  flex: 0 0 auto;
   display:flex;
   flex-direction:column;
   align-items:center;
+
+  /* CENTER vertically again */
   justify-content:center;
+
   gap:12px;
   text-align:center;
-  padding: 18px 0;
+
+  /* Center hero content (headline + subhead + search) within the viewport */
+  min-height: max(360px, calc(100vh - var(--wrap-pad-top) - var(--wrap-pad-bottom)));
+  padding: 10px 0 18px;
 }
+
 
 .headline{
   margin:0;
@@ -278,7 +311,7 @@ textarea:focus {
 
 /* Footer */
 .footer{
-  margin-top:auto;
+  margin-top: 22px; /* normal spacing, not forced to bottom */
   padding-top:16px;
   border-top:1px solid rgba(234,240,255,.10);
   color:var(--muted);
@@ -289,6 +322,7 @@ textarea:focus {
   align-items:center;
   flex-wrap:wrap;
 }
+
 
 .dot{ opacity:.6; }
 
@@ -372,7 +406,11 @@ label input, label textarea {
 }
 
 @media (max-width:640px){
-  .wrap{ padding:0 14px 18px; }
+  .wrap{
+    --wrap-pad-top: 0px;
+    --wrap-pad-bottom: 18px;
+    padding: var(--wrap-pad-top) 14px var(--wrap-pad-bottom);
+  }
   .headline{ font-size: 24px; }
   .subhead{ font-size: 13px; }
   input, textarea{ font-size: 15px; }
@@ -381,4 +419,12 @@ label input, label textarea {
     background-size: 320px;
     opacity: 1;
   }
+}
+/* When the iframe/viewport height is short, scale spacing down */
+@media (max-height: 720px){
+  .wrap{ --wrap-pad-top: 54px; }
+  .headline{ font-size: 38px; }
+  .subhead{ font-size: 16px; max-width: 560px; }
+  .top{ min-height: max(320px, calc(100vh - var(--wrap-pad-top) - var(--wrap-pad-bottom))); }
+  .searchCard{ margin-top: 10px; }
 }

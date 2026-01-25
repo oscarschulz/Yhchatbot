@@ -3,22 +3,6 @@ const goBtn = document.getElementById("goBtn");
 const list = document.getElementById("list");
 const empty = document.getElementById("empty");
 
-// Go to Homepage logic (works even if embedded in iframe)
-const homeBtn = document.getElementById("homeBtn");
-if (homeBtn) {
-  homeBtn.addEventListener("click", (e) => {
-    // Let the <a href> work, but ensure top navigation for embedded contexts.
-    // Prevent default only if you want to force the JS route:
-    e.preventDefault();
-    try {
-      window.top.location.href = "https://younghustlers.net/";
-    } catch (_) {
-      // Fallback if top navigation blocked
-      window.location.href = "https://younghustlers.net/";
-    }
-  });
-}
-
 // Person-connection flow UI elements
 const personBox = document.getElementById("personBox");
 const personHead = document.getElementById("personHead");
@@ -57,6 +41,7 @@ function tokenize(s) {
 function meaningfulTokens(s) {
   return tokenize(s).filter(t => t.length > 2 && !STOPWORDS.has(t));
 }
+
 
 function scoreItem(item, query) {
   if (!query) return 0;
@@ -114,6 +99,7 @@ function hideOutputs() {
   empty.classList.add("hidden");
   list.innerHTML = "";
 
+  // Reset Person Box state slightly but don't close it if it's open
   if (personBox) {
     personBox.classList.add("hidden");
   }
@@ -179,18 +165,22 @@ function showPersonFlow(raw) {
   personBox.classList.remove("hidden");
   personBox.classList.add("open");
 
+  // --- FIXED SECTION: Reset form state properly ---
   if (connectForm) {
     connectForm.reset();
     connectForm.classList.add("hidden");
+    // Important: Remove the inline 'display:none' from previous success, 
+    // but DO NOT set it to 'block' yet. Let the CSS class control it.
     connectForm.style.display = ""; 
   }
-
+  
   if (connectStatus) {
     connectStatus.classList.add("hidden");
     connectStatus.innerHTML = ""; 
     connectStatus.className = "hintRow hidden"; 
   }
-
+  
+  // Reset message area (remove the Checkmark UI from previous success)
   if (personMsg) {
     personMsg.style.display = "block";
     personMsg.className = ""; 
@@ -199,7 +189,7 @@ function showPersonFlow(raw) {
 
   const target = extractPersonTarget(raw);
   const base = target ? `Searching the YH network for "${target}"` : "Searching the YH network";
-
+  
   let dots = 0;
   if (personMsg) personMsg.textContent = base;
 
@@ -216,7 +206,7 @@ function showPersonFlow(raw) {
 
     if (personMsg) personMsg.textContent = "We might be able to connect you with him, but firstly, fill this form out.";
     if (connectForm) connectForm.classList.remove("hidden");
-
+    
     personBox.scrollIntoView({ behavior: "smooth", block: "center" });
   }, delayMs);
 
@@ -242,7 +232,7 @@ function runSearch() {
     .map(x => x.item);
 
   if (personBox) personBox.classList.add("hidden");
-
+  
   if (!scored.length) {
     list.classList.add("hidden");
     empty.classList.remove("hidden");
@@ -261,9 +251,10 @@ function handleTyping() {
     hideOutputs();
     return;
   }
+  // Clear person search timers if typing changes
   if (personSearchTimeout) clearTimeout(personSearchTimeout);
   if (personDotsInterval) clearInterval(personDotsInterval);
-
+  
   if (personBox) personBox.classList.add("hidden");
   list.classList.add("hidden");
   empty.classList.add("hidden");
@@ -294,6 +285,7 @@ if (connectForm) {
     const formData = new FormData(connectForm);
     const data = Object.fromEntries(formData.entries());
 
+    // Basic Validation
     const missing = [];
     if (!data.firstName) missing.push("Name");
     if (!data.surname) missing.push("Surname");
@@ -310,6 +302,7 @@ if (connectForm) {
       return;
     }
 
+    // --- 1. Loading State ---
     const submitBtn = connectForm.querySelector('button[type="submit"]');
     const originalBtnText = submitBtn ? (submitBtn.dataset.originalText || submitBtn.textContent) : "Submit";
 
@@ -320,14 +313,18 @@ if (connectForm) {
       submitBtn.textContent = "Sending...";
     }
 
+    // --- 2. Send to Google Sheets ---
     fetch(WEB_APP_URL, {
       method: "POST",
       body: formData
     })
-    .then(res => res.text())
-    .then(() => {
+    .then(res => res.text()) // Use text() first to avoid JSON parse errors on redirects
+    .then(text => {
+      // --- 3. SUCCESS UI ---
+      // Hide the form completely
       connectForm.style.display = "none";
-
+      
+      // Update the message area to show Big Success
       if (personMsg) {
         personMsg.innerHTML = `
           <div style="text-align:center; padding: 20px 0;">
@@ -345,8 +342,9 @@ if (connectForm) {
       if (connectStatus) {
         connectStatus.textContent = "Error submitting. Please try again.";
         connectStatus.classList.remove("hidden");
-        connectStatus.style.color = "#ff6b6b";
+        connectStatus.style.color = "#ff6b6b"; 
       }
+      // Re-enable button so they can try again
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.classList.remove("is-loading");
