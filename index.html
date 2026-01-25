@@ -9,15 +9,15 @@
 <body>
   <!-- Go to Homepage (upper-right) -->
   <a
-  id="homeBtn"
-  class="home-nav-btn"
-  href="https://www.younghustlers.net/main"
-  target="_top"
-  rel="noopener"
->
-  Go to Homepage ›
-</a>
-
+    id="homeBtn"
+    class="home-nav-btn"
+    href="https://www.younghustlers.net/main"
+    target="_top"
+    rel="noopener"
+    onclick="window.open(this.href, '_top'); return false;"
+  >
+    Go to Homepage ›
+  </a>
 
   <main class="wrap">
     <header class="top">
@@ -51,7 +51,7 @@
           <div class="chev">▾</div>
         </div>
         <div class="answer">
-          <p id="personMsg">We might be able to connect you with him, but firstly, fill this form out.</p>
+          <p id="personMsg">We might be able to connect you with that person, but firstly, fill this form out.</p>
 
           <form id="connectForm" autocomplete="off">
             <label>Name <input name="firstName" type="text" required /></label>
