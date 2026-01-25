@@ -204,7 +204,7 @@ function showPersonFlow(raw) {
     personDotsInterval = null;
     personSearchTimeout = null;
 
-    if (personMsg) personMsg.textContent = "We might be able to connect you with him, but firstly, fill this form out.";
+    if (personMsg) personMsg.textContent = "We might be able to connect you with that person, but firstly, fill this form out.";
     if (connectForm) connectForm.classList.remove("hidden");
     
     personBox.scrollIntoView({ behavior: "smooth", block: "center" });
