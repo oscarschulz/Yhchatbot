@@ -587,7 +587,7 @@ body::-webkit-scrollbar{
 
   :root{
     /* tweak this if you want the headline/search lower */
-    --yh-ui-nudge: 44px;
+    --yh-ui-nudge: 150px;
   }
 
   html, body{
