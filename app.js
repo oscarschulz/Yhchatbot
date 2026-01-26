@@ -188,6 +188,11 @@ function showPersonFlow(raw) {
   }
 
   const target = extractPersonTarget(raw);
+
+  // Auto-fill the contact person field from the search input
+  const contactPersonEl = document.getElementById("contactPerson");
+  if (contactPersonEl) contactPersonEl.value = target || raw;
+
   const base = target ? `Searching the YH network for "${target}"` : "Searching the YH network";
   
   let dots = 0;
@@ -294,6 +299,7 @@ if (connectForm) {
     if (!data.birthdate) missing.push("Birthdate");
     if (!data.country) missing.push("Country");
     if (!data.city) missing.push("City");
+    if (!data.contactPerson) missing.push("Who you're trying to contact");
     if (!data.profession) missing.push("Profession");
     if (!data.experience) missing.push("Past Experience");
 
