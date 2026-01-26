@@ -575,3 +575,116 @@ body::-webkit-scrollbar{
     padding-top: calc(env(safe-area-inset-top) + 34px);
   }
 }
+/* =========================================================
+   MOBILE CONSISTENCY PATCH (append) – iOS + small screens
+   Goals:
+   1) Stable layout on all mobile heights (iPhone address bar)
+   2) Push hero content slightly lower on mobile
+   3) Fix "cannot scroll" when the connect form opens
+      (because .answer was overflow:hidden + fixed max-height)
+   ========================================================= */
+@media (max-width: 640px){
+
+  :root{
+    /* tweak this if you want the headline/search lower */
+    --yh-ui-nudge: 44px;
+  }
+
+  html, body{
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
+  }
+
+  .home-nav-btn{
+    right: calc(env(safe-area-inset-right) + 12px);
+    top:   calc(env(safe-area-inset-top) + 12px);
+    padding: 9px 12px;
+    font-size: 12px;
+  }
+
+  .wrap{
+    max-width: 620px;
+
+    --wrap-pad-top:    calc(env(safe-area-inset-top) + 64px);
+    --wrap-pad-bottom: calc(env(safe-area-inset-bottom) + 18px);
+
+    /* 4-value padding: top | right | bottom | left */
+    padding:
+      var(--wrap-pad-top)
+      calc(16px + env(safe-area-inset-right))
+      var(--wrap-pad-bottom)
+      calc(16px + env(safe-area-inset-left));
+  }
+
+  .top{
+    justify-content: flex-start;
+    padding-top: calc(18px + var(--yh-ui-nudge));
+    min-height: max(360px, calc(100svh - var(--wrap-pad-top) - var(--wrap-pad-bottom)));
+  }
+  @supports (height: 100dvh){
+    .top{
+      min-height: max(360px, calc(100dvh - var(--wrap-pad-top) - var(--wrap-pad-bottom)));
+    }
+  }
+
+  .headline{
+    font-size: clamp(22px, 6.5vw, 30px);
+    line-height: 1.08;
+  }
+
+  .subhead{
+    font-size: 12px;
+    line-height: 1.35;
+    max-width: 34ch;
+  }
+
+  .searchCard{
+    width: 100%;
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  /* IMPORTANT: font-size 16px prevents iOS auto-zoom on focus */
+  .searchInput{
+    font-size: 16px;
+    padding: 14px;
+  }
+
+  .goButton{
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+  }
+
+  .hint{
+    font-size: 11px;
+  }
+
+  body::before{
+    background-size: cover !important;
+    background-position: 50% 35% !important;
+  }
+
+  /* FIX: this is the actual blocker of scrolling for the form */
+  #personBox.card.open .answer{
+    max-height: min(72svh, 720px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+  }
+  @supports (height: 100dvh){
+    #personBox.card.open .answer{
+      max-height: min(72dvh, 720px);
+    }
+  }
+
+  #connectForm input,
+  #connectForm textarea,
+  #connectForm select{
+    font-size: 16px;
+  }
+}
