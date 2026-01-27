@@ -107,6 +107,8 @@ body::after{
   display:flex;
   flex-direction:column;
   align-items:center;
+  position: relative;
+  isolation: isolate;
 
   /* CENTER vertically again */
   justify-content:center;
@@ -125,6 +127,11 @@ body::after{
   font-weight:800;
   letter-spacing:-.3px;
   font-size: 50px;
+
+  transform-origin: 50% 140%;
+  will-change: transform, opacity, filter;
+  animation: yhFromGlow 1.05s cubic-bezier(0.15, 0.9, 0.25, 1) both;
+  animation-delay: 120ms;
 }
 
 .subhead{
@@ -133,7 +140,108 @@ body::after{
   line-height:1.5;
   max-width: 640px;
   font-size: 22px;
+
+  transform-origin: 50% 140%;
+  will-change: transform, opacity, filter;
+  animation: yhFromGlow 1.05s cubic-bezier(0.15, 0.9, 0.25, 1) both;
+  animation-delay: 340ms;
 }
+
+/* =========================
+   Intro animation (from glow)
+   ========================= */
+
+@keyframes yhFromGlow{
+  0%{
+    opacity: 0;
+    transform: translate3d(0, 200px, 0) scale(0.72);
+    filter: blur(10px);
+  }
+  55%{
+    opacity: 1;
+    transform: translate3d(0, 10px, 0) scale(0.98);
+    filter: blur(2px);
+  }
+  100%{
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes yhSearchExpand{
+  0%{
+    opacity: 0;
+    transform: translate3d(0, 200px, 0) scaleX(0.18) scaleY(0.86);
+    filter: blur(12px);
+  }
+  55%{
+    opacity: 1;
+    transform: translate3d(0, 14px, 0) scaleX(1.02) scaleY(0.98);
+    filter: blur(2px);
+  }
+  100%{
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scaleX(1) scaleY(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes yhSourceGlow{
+  0%{
+    opacity: 0;
+    transform: translateX(-50%) scale(0.20);
+  }
+  35%{
+    opacity: 0.85;
+    transform: translateX(-50%) scale(1);
+  }
+  100%{
+    opacity: 0;
+    transform: translateX(-50%) scale(1.25);
+  }
+}
+
+.top::before{
+  content:"";
+  position:absolute;
+  left: 50%;
+  bottom: clamp(40px, 10vh, 300px);;
+  width: min(560px, 86vw);
+  aspect-ratio: 1 / 1;
+  background: radial-gradient(
+    circle at center,
+    rgba(100,233,238,0.32) 0%,
+    rgba(100,233,238,0.14) 16%,
+    rgba(100,233,238,0.00) 60%
+  );
+  filter: blur(18px);
+  opacity: 0;
+  transform: translateX(-50%) scale(0.20);
+  pointer-events:none;
+  z-index: 0;
+  mix-blend-mode: screen;
+  animation: yhSourceGlow 1.35s ease-out both;
+  animation-delay: 80ms;
+}
+
+.top > *{
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .headline,
+  .subhead,
+  .searchCard,
+  .top::before{
+    animation: none !important;
+    transform: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+  }
+}
+
 
 /* Search card */
 .searchCard{
@@ -145,6 +253,11 @@ body::after{
   box-shadow: 0 26px 60px rgba(0,0,0,.6);
   backdrop-filter: blur(12px);
   margin-top: 15px;
+
+  transform-origin: 50% 140%;
+  will-change: transform, opacity, filter;
+  animation: yhSearchExpand 1.20s cubic-bezier(0.15, 0.9, 0.25, 1) both;
+  animation-delay: 580ms;
 }
 
 .searchRow{
@@ -690,28 +803,14 @@ body::-webkit-scrollbar{
 }
 
 
-/* =========================
-   Explore Young Hustlers CTA (landing + success)
-   ========================= */
-
-/* Explore Now row under the search card */
-.exploreNow{
-  margin-top: 12px;
+/* Success CTA (shown after successful connection request) */
+.success-cta{
+  width:100%;
   display:flex;
   justify-content:center;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  color: var(--muted);
-  font-size: 13px;
-  text-align:center;
+  margin-top: 14px;
 }
 
-.exploreNowText{
-  color: var(--muted);
-}
-
-/* Base Explore button */
 .explore-btn{
   display:inline-flex;
   align-items:center;
@@ -729,22 +828,15 @@ body::-webkit-scrollbar{
 .explore-btn:hover{
   background: rgba(0,0,0,.48);
 }
-
-/* Button size variants */
-.explore-btn--small{
-  padding: 10px 14px;
-  font-size: 13px;
-  border-radius: 12px;
-}
-
-.explore-btn--inline{
-  padding: 8px 12px;
-  font-size: 13px;
-  border-radius: 12px;
-  margin: 0 6px;
-  vertical-align: middle;
-}
-
 /* Force-hide anything with .hidden even if later rules set display */
 .hidden{ display:none !important; }
-
+/* Inline version of explore button for text links */
+.explore-btn--inline{
+  display: inline;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  font-weight: 600;
+  text-decoration: underline;
+}

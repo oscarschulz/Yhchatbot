@@ -21,6 +21,91 @@ let personDotsInterval = null;
 
 // --- Helper Functions ---
 
+// --- Hero Intro Animation (typing + synced with CSS) ---
+function prefersReducedMotion(){
+  return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function typeText(el, fullText, speedMs = 26, startDelayMs = 0){
+  return new Promise((resolve) => {
+    if (!el) return resolve();
+    const text = (fullText || "").toString();
+    let i = 0;
+
+    const start = () => {
+      const timer = setInterval(() => {
+        i += 1;
+        el.textContent = text.slice(0, i);
+        if (i >= text.length) {
+          clearInterval(timer);
+          resolve();
+        }
+      }, Math.max(10, speedMs));
+    };
+
+    if (startDelayMs > 0) setTimeout(start, startDelayMs);
+    else start();
+  });
+}
+
+function typePlaceholder(inputEl, fullText, speedMs = 16, startDelayMs = 0){
+  if (!inputEl) return;
+  const text = (fullText || "").toString();
+  let i = 0;
+
+  const start = () => {
+    const timer = setInterval(() => {
+      i += 1;
+      inputEl.setAttribute("placeholder", text.slice(0, i));
+      if (i >= text.length) clearInterval(timer);
+    }, Math.max(10, speedMs));
+  };
+
+  // keep a tiny placeholder so the field doesn't look "broken" during the delay
+  inputEl.setAttribute("placeholder", " ");
+
+  if (startDelayMs > 0) setTimeout(start, startDelayMs);
+  else start();
+}
+
+function runHeroIntro(){
+  // Don't run if user prefers reduced motion
+  if (prefersReducedMotion()) return;
+
+  const headlineEl = document.querySelector(".headline");
+  const subheadEl = document.querySelector(".subhead");
+
+  if (!headlineEl || !subheadEl) return;
+  if (headlineEl.dataset.introDone === "1") return;
+
+  const headlineText = (headlineEl.dataset.fullText || headlineEl.textContent || "").trim();
+  const subheadText = (subheadEl.dataset.fullText || subheadEl.textContent || "").trim();
+
+  // store originals once
+  headlineEl.dataset.fullText = headlineText;
+  subheadEl.dataset.fullText = subheadText;
+
+  headlineEl.textContent = "";
+  subheadEl.textContent = "";
+
+  // Typing sequence (synced with CSS entrance delays)
+  typeText(headlineEl, headlineText, 28, 260)
+    .then(() => typeText(subheadEl, subheadText, 16, 120))
+    .finally(() => {
+      headlineEl.dataset.introDone = "1";
+    });
+
+  // Optional: type the placeholder prompt as well
+  if (q) {
+    const ph = (q.dataset.fullPlaceholder || q.getAttribute("placeholder") || "").trim();
+    q.dataset.fullPlaceholder = ph || q.dataset.fullPlaceholder || "";
+    if (q.dataset.fullPlaceholder) {
+      typePlaceholder(q, q.dataset.fullPlaceholder, 14, 720);
+    }
+  }
+}
+
+
 function normalize(s) {
   return (s || "").toString().toLowerCase().trim();
 }
@@ -194,6 +279,11 @@ function showPersonFlow(raw) {
   // Show the "Takes less than 60 seconds" hint only when the form is ready
   if (timeHint) timeHint.style.display = "none";
 
+      // Hide hero headline + subhead + search after successful submission
+      const heroTop = document.querySelector("header.top");
+      if (heroTop) heroTop.classList.add("hidden");
+
+
   if (successCtaWrap) successCtaWrap.classList.add("hidden");
 
   const target = extractPersonTarget(raw);
@@ -232,6 +322,7 @@ function runSearch() {
   const raw = (q.value || "").trim();
   if (!raw) {
     hideOutputs();
+runHeroIntro();
     return;
   }
   if (looksLikeSpecificPersonQuery(raw)) {
@@ -264,6 +355,7 @@ function handleTyping() {
   const raw = (q.value || "").trim();
   if (!raw) {
     hideOutputs();
+runHeroIntro();
     return;
   }
   // Clear person search timers if typing changes
@@ -345,7 +437,7 @@ if (connectForm) {
         personMsg.innerHTML = `
           <div style="text-align:center; padding: 20px 0;">
             <div style="font-size: 40px; margin-bottom: 10px;">⏳</div>
-            <h3 style="margin:0 0 10px; color:#EAF0FF;">Request Under Review ⏳</h3>
+            <h3 style="margin:0 0 10px; color:#EAF0FF;">Request Under Review</h3>
 
             <p style="margin:0 0 12px; font-size:14px; color:rgba(234,240,255,.8); line-height:1.45;">
               Your request has been successfully received.<br/>
@@ -353,7 +445,7 @@ if (connectForm) {
             </p>
 
             <p style="margin:0 0 12px; font-size:14px; color:rgba(234,240,255,.7); line-height:1.45;">
-              If approved, a representative will contact you at <strong>oscarschulzbusiness@gmail.com</strong>.<br/>
+              If approved, a representative will contact you at <strong>name@example.com</strong>.<br/>
               Please allow up to 48 hours for review.
             </p>
 
@@ -362,11 +454,13 @@ if (connectForm) {
             </p>
 
             <p style="margin:0; font-size:14px; color:rgba(234,240,255,.7); line-height:1.45;">
-              In the meantime, you may <a class="explore-btn explore-btn--inline" href="https://www.younghustlers.net/main" target="_top" rel="noopener" onclick="window.open(this.href, '_top'); return false;">Explore Young Hustlers ›</a>
+              In the meantime, you may <a class="explore-btn" href="https://www.younghustlers.net/main" target="_top" rel="noopener" onclick="window.open(this.href, '_top'); return false;">Explore Young Hustlers</a>.
             </p>
           </div>
         `;
       }
+
+      if (successCtaWrap) successCtaWrap.classList.remove("hidden");
     })
     .catch(err => {
       console.error(err);
@@ -386,3 +480,4 @@ if (connectForm) {
 }
 
 hideOutputs();
+runHeroIntro();
