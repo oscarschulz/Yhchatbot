@@ -7,6 +7,8 @@ const empty = document.getElementById("empty");
 const personBox = document.getElementById("personBox");
 const personHead = document.getElementById("personHead");
 const personMsg = document.getElementById("personMsg");
+const timeHint = document.getElementById("timeHint");
+const successCtaWrap = document.getElementById("successCtaWrap");
 const connectForm = document.getElementById("connectForm");
 const connectStatus = document.getElementById("connectStatus");
 
@@ -64,6 +66,8 @@ function scoreItem(item, query) {
 
 function render(items) {
   list.innerHTML = "";
+
+  if (successCtaWrap) successCtaWrap.classList.add("hidden");
   for (const item of items) {
     const card = document.createElement("div");
     card.className = "card";
@@ -187,6 +191,11 @@ function showPersonFlow(raw) {
     personMsg.innerHTML = ""; 
   }
 
+  // Show the "Takes less than 60 seconds" hint only when the form is ready
+  if (timeHint) timeHint.style.display = "none";
+
+  if (successCtaWrap) successCtaWrap.classList.add("hidden");
+
   const target = extractPersonTarget(raw);
 
   // Auto-fill the contact person field from the search input
@@ -209,8 +218,9 @@ function showPersonFlow(raw) {
     personDotsInterval = null;
     personSearchTimeout = null;
 
-    if (personMsg) personMsg.textContent = "We might be able to connect you with that person, but firstly, fill this form out.";
+    if (personMsg) personMsg.textContent = "Complete the form below. Our team will review it and get back to you if the request qualifies.";
     if (connectForm) connectForm.classList.remove("hidden");
+    if (timeHint) timeHint.style.display = "block";
     
     personBox.scrollIntoView({ behavior: "smooth", block: "center" });
   }, delayMs);
@@ -296,7 +306,6 @@ if (connectForm) {
     if (!data.surname) missing.push("Surname");
     if (!data.email) missing.push("Email");
     if (!data.age) missing.push("Age");
-    if (!data.birthdate) missing.push("Birthdate");
     if (!data.country) missing.push("Country");
     if (!data.city) missing.push("City");
     if (!data.contactPerson) missing.push("Who you're trying to contact");
@@ -329,19 +338,37 @@ if (connectForm) {
       // --- 3. SUCCESS UI ---
       // Hide the form completely
       connectForm.style.display = "none";
+      if (timeHint) timeHint.style.display = "none";
       
       // Update the message area to show Big Success
       if (personMsg) {
         personMsg.innerHTML = `
           <div style="text-align:center; padding: 20px 0;">
-            <div style="font-size: 40px; margin-bottom: 10px;">✅</div>
-            <h3 style="margin:0 0 8px; color:#EAF0FF;">Request Received</h3>
-            <p style="margin:0; font-size:14px; color:rgba(234,240,255,.7);">
-              We have received your details. If you are a match, a representative will contact you at <strong>${data.email}</strong>.
+            <div style="font-size: 40px; margin-bottom: 10px;">⏳</div>
+            <h3 style="margin:0 0 10px; color:#EAF0FF;">Request Under Review ⏳</h3>
+
+            <p style="margin:0 0 12px; font-size:14px; color:rgba(234,240,255,.8); line-height:1.45;">
+              Your request has been successfully received.<br/>
+              Our team is currently reviewing your information.
+            </p>
+
+            <p style="margin:0 0 12px; font-size:14px; color:rgba(234,240,255,.7); line-height:1.45;">
+              If approved, a representative will contact you at <strong>name@example.com</strong>.<br/>
+              Please allow up to 48 hours for review.
+            </p>
+
+            <p style="margin:0 0 12px; font-size:14px; color:rgba(234,240,255,.7); line-height:1.45;">
+              Due to high demand, not all requests are approved.
+            </p>
+
+            <p style="margin:0; font-size:14px; color:rgba(234,240,255,.7); line-height:1.45;">
+              In the meantime, you may explore Young Hustlers or return to the homepage.
             </p>
           </div>
         `;
       }
+
+      if (successCtaWrap) successCtaWrap.classList.remove("hidden");
     })
     .catch(err => {
       console.error(err);
