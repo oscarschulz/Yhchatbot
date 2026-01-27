@@ -454,7 +454,7 @@ if (connectForm) {
             </p>
 
             <p style="margin:0; font-size:14px; color:rgba(234,240,255,.7); line-height:1.45;">
-              In the meantime, you may <a class="explore-btn" href="https://www.younghustlers.net/main" target="_top" rel="noopener" onclick="window.open(this.href, '_top'); return false;">Explore Young Hustlers</a>.
+              In the meantime, you may <a class="explore-btn" href="https://www.younghustlers.net/main" target="_top" rel="noopener" onclick="window.open(this.href, '_top'); return false;">Explore Young Hustlers</a>
             </p>
           </div>
         `;
