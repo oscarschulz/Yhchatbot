@@ -353,7 +353,7 @@ if (connectForm) {
             </p>
 
             <p style="margin:0 0 12px; font-size:14px; color:rgba(234,240,255,.7); line-height:1.45;">
-              If approved, a representative will contact you at <strong>name@example.com</strong>.<br/>
+              If approved, a representative will contact you at <strong>oscarschulzbusiness@gmail.com</strong>.<br/>
               Please allow up to 48 hours for review.
             </p>
 
@@ -362,13 +362,11 @@ if (connectForm) {
             </p>
 
             <p style="margin:0; font-size:14px; color:rgba(234,240,255,.7); line-height:1.45;">
-              In the meantime, you may explore Young Hustlers or return to the homepage.
+              In the meantime, you may <a class="explore-btn explore-btn--inline" href="https://www.younghustlers.net/main" target="_top" rel="noopener" onclick="window.open(this.href, '_top'); return false;">Explore Young Hustlers ›</a>
             </p>
           </div>
         `;
       }
-
-      if (successCtaWrap) successCtaWrap.classList.remove("hidden");
     })
     .catch(err => {
       console.error(err);

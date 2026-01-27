@@ -690,14 +690,28 @@ body::-webkit-scrollbar{
 }
 
 
-/* Success CTA (shown after successful connection request) */
-.success-cta{
-  width:100%;
+/* =========================
+   Explore Young Hustlers CTA (landing + success)
+   ========================= */
+
+/* Explore Now row under the search card */
+.exploreNow{
+  margin-top: 12px;
   display:flex;
   justify-content:center;
-  margin-top: 14px;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  color: var(--muted);
+  font-size: 13px;
+  text-align:center;
 }
 
+.exploreNowText{
+  color: var(--muted);
+}
+
+/* Base Explore button */
 .explore-btn{
   display:inline-flex;
   align-items:center;
@@ -715,5 +729,22 @@ body::-webkit-scrollbar{
 .explore-btn:hover{
   background: rgba(0,0,0,.48);
 }
+
+/* Button size variants */
+.explore-btn--small{
+  padding: 10px 14px;
+  font-size: 13px;
+  border-radius: 12px;
+}
+
+.explore-btn--inline{
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 12px;
+  margin: 0 6px;
+  vertical-align: middle;
+}
+
 /* Force-hide anything with .hidden even if later rules set display */
 .hidden{ display:none !important; }
+
