@@ -15,6 +15,46 @@ const connectStatus = document.getElementById("connectStatus");
 // --- URL galing sa screenshot mo (Version 4) ---
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz1mh08zgqOU-gTAgVGX7bnnLWUcdqFQXK_sYh3ZYfghlOyufvt_WT9xa9IO9mOqhpF/exec"; 
 
+
+// -------------------------------------------------------------
+// iOS Safari / Mobile viewport fix (prevents 100vh jumps in iFrames)
+// Sets CSS vars:
+//   --yh-vh   = 1% viewport height in px
+//   --yh-vh100= 100% viewport height in px
+//   --yh-vw100= 100% viewport width in px
+// -------------------------------------------------------------
+(function setupViewportVars(){
+  let raf = null;
+  const setVars = () => {
+    raf = null;
+    const vv = window.visualViewport;
+    const h = vv ? vv.height : window.innerHeight;
+    const w = vv ? vv.width : window.innerWidth;
+    document.documentElement.style.setProperty('--yh-vh', (h * 0.01) + 'px');
+    document.documentElement.style.setProperty('--yh-vh100', h + 'px');
+    document.documentElement.style.setProperty('--yh-vw100', w + 'px');
+  };
+  const schedule = () => {
+    if (raf) return;
+    raf = requestAnimationFrame(setVars);
+  };
+  setVars();
+  window.addEventListener('resize', schedule, { passive: true });
+  window.addEventListener('orientationchange', schedule, { passive: true });
+  window.addEventListener('pageshow', schedule, { passive: true });
+  document.addEventListener('visibilitychange', schedule, { passive: true });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', schedule, { passive: true });
+    // On iOS the URL bar can animate without a resize; scroll listener catches that.
+    window.visualViewport.addEventListener('scroll', schedule, { passive: true });
+  }
+
+  // Keyboard open/close can be delayed; refresh shortly after focus changes.
+  window.addEventListener('focusin', () => setTimeout(schedule, 50), { passive: true });
+  window.addEventListener('focusout', () => setTimeout(schedule, 50), { passive: true });
+})();
+
 // Timers for the fake searching animation
 let personSearchTimeout = null;
 let personDotsInterval = null;
@@ -445,7 +485,7 @@ if (connectForm) {
             </p>
 
             <p style="margin:0 0 12px; font-size:14px; color:rgba(234,240,255,.7); line-height:1.45;">
-              If approved, a representative will contact you at <strong>name@example.com</strong>.<br/>
+              If approved, a representative will contact you at <strong>oscarschulzbusiness@gmail.com</strong>.<br/>
               Please allow up to 48 hours for review.
             </p>
 
@@ -478,6 +518,46 @@ if (connectForm) {
     });
   });
 }
+
+
+
+// --- Mobile-only layout fix: move the "Not looking for anyone?" row OUTSIDE the search card ---
+(function setupExploreNowPlacement(){
+  const exploreNow = document.querySelector(".exploreNow");
+  const searchCard = document.querySelector(".searchCard");
+  const heroTop = document.querySelector("header.top");
+  if (!exploreNow || !searchCard || !heroTop) return;
+
+  function placeExploreNowForMobile(){
+    const isMobile = window.matchMedia("(max-width: 640px)").matches;
+    if (isMobile){
+      // Move outside the search card (still inside header) so it doesn't look cramped on small screens
+      if (exploreNow.parentElement === searchCard){
+        searchCard.insertAdjacentElement("afterend", exploreNow);
+      }
+      exploreNow.classList.add("exploreNow--outer");
+    } else {
+      // Restore inside the card on larger screens
+      if (exploreNow.parentElement !== searchCard){
+        const searchRow = searchCard.querySelector(".searchRow");
+        if (searchRow) searchRow.insertAdjacentElement("afterend", exploreNow);
+        else searchCard.appendChild(exploreNow);
+      }
+      exploreNow.classList.remove("exploreNow--outer");
+    }
+  }
+
+  let t;
+  function schedule(){
+    clearTimeout(t);
+    t = setTimeout(placeExploreNowForMobile, 80);
+  }
+
+  placeExploreNowForMobile();
+  window.addEventListener("resize", schedule, { passive:true });
+  window.addEventListener("orientationchange", schedule, { passive:true });
+})();
+
 
 hideOutputs();
 runHeroIntro();
