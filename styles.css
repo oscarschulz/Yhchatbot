@@ -34,11 +34,11 @@ input, button, textarea, select{
 .bgVideoWrap{
   position: fixed;
   inset: 0;
-  z-index: -2;
+  z-index: 0;
   overflow: hidden;
   background: #000;
   pointer-events: none;
-  opacity: 0;
+  opacity: 1;
   transition: opacity 380ms ease;
 }
 body.video-ready .bgVideoWrap{ opacity: 1; }
