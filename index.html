@@ -6,75 +6,145 @@
   <title>Ask YH</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-<main class="wrap">
-    <header class="top">
-  <h1 class="headline">Who are you looking for?</h1>
-  <p class="subhead">You are 5 handshakes away from anyone in this world, start here.</p>
 
-  <div class="searchCard">
-    <div class="searchRow">
-      <input
-        id="q"
-        type="text"
-        placeholder='Try: "Amazon employee", "Politician in California", "Gardener in Sydney" etc.'
-        autocomplete="off"
-      />
-      <button id="goBtn" class="goBtn" type="button" aria-label="Search">
-        <span class="goIcon">›</span>
-      </button>
-    </div>
-
-    <div class="hintRow">
+<body class="hero-prep">
+  <!-- Video Background -->
+  <div class="bgVideoWrap" aria-hidden="true">
+    <video
+      class="bgVideo"
+      id="bgVideo"
+      autoplay
+      muted
+      playsinline
+      preload="auto"
+      poster=""
+      data-hero-start-ms="3000"
+      data-logo-fade-ms="800"
+      data-freeze-at-ms="5000"
+    >
+      <source src="yhvideo3.mp4" type="video/mp4" />
+    </video>
+    <div class="bgVideoOverlay"></div>
   </div>
 
-  <!-- OUTSIDE searchCard (desktop + mobile) -->
-  <div class="exploreNow" aria-label="Explore Young Hustlers shortcut">
-    <span class="exploreNowText">Not looking for anyone?</span>
-    <a id="exploreNowBtn" class="explore-btn explore-btn--mini" href="/main">
-      Explore Young Hustlers
-    </a>
-    <span class="exploreNowText">for now.</span>
-  </div>
-</header>
+  <main class="wrap">
+    <header class="top" id="hero">
+      <h1 class="headline" id="heroHeadline">Who are you looking for?</h1>
+      <p class="subhead" id="heroSubhead">You are 5 handshakes away from anyone in this world, start here.</p>
 
-
-    <section class="content">
-      <div id="personBox" class="card hidden open">
-        <div class="cardHead" id="personHead">
-          <h3 class="qTitle">Private Connection Request</h3>
-          <div class="chev">▾</div>
+      <div class="searchCard" id="searchCard">
+        <div class="searchRow">
+          <input
+            id="q"
+            type="text"
+            placeholder='Try: "Amazon employee", "Politician in California", "Gardener in Sydney" etc.'
+            autocomplete="off"
+          />
+          <button id="goBtn" class="goBtn" type="button" aria-label="Search">
+            <span class="goIcon">›</span>
+          </button>
         </div>
-        <div class="answer">
-          <p id="personMsg">Complete the form below. Our team will review it and get back to you if the request qualifies.</p>
-          <label id="timeHint">⏱️ Takes less than 60 seconds.</label>
-          <form id="connectForm" autocomplete="off">
-            <label>First Name <input name="firstName" type="text" required /></label>
-            <label>Last Name <input name="surname" type="text" required /></label>
-            <label>Email [we’ll only use this to contact you] <input name="email" type="email" required placeholder="name@example.com" /></label>
-            <label>Who is the person you're trying to contact? <input name="contactPerson" id="contactPerson" type="text" required placeholder="e.g., Gardener in Sydney" /></label>
-            <label>Age <input name="age" type="number" min="1" step="1" required /></label>
-            <label>Country of Residency <input name="country" type="text" required /></label>
-            <label>Current location / City <input name="city" type="text" required /></label>
-            <label>Current Role / Occupation <input name="profession" type="text" required placeholder="e.g. Founder, Student, Developer, Sales... " /></label>
-            <label>Relevant Experience or Background <textarea name="experience" rows="3" required placeholder="Projects, businesses, skills, or anything you’ve built."></textarea></label>
-            <h3 class="privacy-note">🔒 Your information is reviewed privately by our team and never shared publicly.</h3>
-            <button type="submit">Request Connection</button>
-            <div id="connectStatus" class="hintRow hidden">
-              Submitted. If we can connect you, we’ll follow up.
-            </div>
-          </form>
+
+        <div class="hintRow">
+          <span class="kbd">Enter</span>
+          <span class="hintText">to search</span>
         </div>
       </div>
 
-      <div id="list" class="list hidden"></div>
-      <div id="empty" class="empty hidden">No matches found.</div>
+      <div class="exploreRow" id="exploreRow">
+        <span class="exploreText">Not looking for anyone?</span>
+        <a class="exploreBtn" id="exploreBtn" href="https://www.younghustlers.net/main" target="_top" rel="noopener">
+          Explore Young Hustlers
+        </a>
+        <span class="exploreText">for now.</span>
+      </div>
+    </header>
+
+    <section class="content">
+      <div id="empty" class="empty hidden" aria-live="polite"></div>
+      <div id="list" class="list hidden" aria-live="polite"></div>
+
+      <div id="personBox" class="card hidden">
+        <div class="cardHead" id="personHead">
+          <span id="personTitle">Private Connection Request</span>
+          <button id="closeCard" class="closeBtn" type="button" aria-label="Close">▾</button>
+        </div>
+
+        <div class="cardBody">
+          <div id="personMsg" class="personMsg">
+            <p class="muted">
+              Submit a private request. If approved, someone from our team will contact you.
+            </p>
+          </div>
+
+          <form id="connectForm" class="form hidden" novalidate>
+            <div class="grid2">
+              <div class="field">
+                <label for="firstName">Name</label>
+                <input id="firstName" name="firstName" type="text" autocomplete="given-name" required />
+              </div>
+
+              <div class="field">
+                <label for="surname">Surname</label>
+                <input id="surname" name="surname" type="text" autocomplete="family-name" required />
+              </div>
+            </div>
+
+            <div class="grid2">
+              <div class="field">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" autocomplete="email" required />
+              </div>
+
+              <div class="field">
+                <label for="age">Age</label>
+                <input id="age" name="age" type="number" min="13" max="120" inputmode="numeric" required />
+              </div>
+            </div>
+
+            <!-- ✅ Birthdate REMOVED. Country stays clean as full-width row -->
+            <div class="field">
+              <label for="country">Country</label>
+              <input id="country" name="country" type="text" autocomplete="country-name" required />
+            </div>
+
+            <div class="grid2">
+              <div class="field">
+                <label for="city">City</label>
+                <input id="city" name="city" type="text" autocomplete="address-level2" required />
+              </div>
+
+              <div class="field">
+                <label for="contactPerson">Who are you trying to contact?</label>
+                <input id="contactPerson" name="contactPerson" type="text" required />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="profession">Profession</label>
+              <input id="profession" name="profession" type="text" required />
+            </div>
+
+            <div class="field">
+              <label for="experience">Past Experience</label>
+              <textarea
+                id="experience"
+                name="experience"
+                rows="4"
+                required
+                placeholder="Briefly describe your background, what you’ve done, and why you need this connection."
+              ></textarea>
+            </div>
+
+            <button class="submitBtn" type="submit">Submit Request</button>
+            <div id="connectStatus" class="status hidden" aria-live="polite"></div>
+          </form>
+        </div>
+      </div>
     </section>
 
     <footer class="footer">
-      <span>© Young Hustlers</span>
-      <span class="dot">•</span>
-      <span>Everything & Everyone, Everywhere.</span>
+      © Young Hustlers ・ Everything &amp; Everyone, Everywhere.
     </footer>
   </main>
 

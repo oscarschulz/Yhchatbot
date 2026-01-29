@@ -1,145 +1,122 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
 :root{
-  --bg:#000000;
   --text:#EAF0FF;
   --muted:rgba(234,240,255,.65);
   --line:rgba(234,240,255,.12);
 
-  /* Glass */
   --glass:rgba(255,255,255,.06);
   --glass2:rgba(255,255,255,.08);
   --radius:18px;
 
   --focus: rgba(100,233,238,.45);
   --glow: rgba(100,233,238,.15);
-
-  /* Viewport unit fallbacks (set dynamically in app.js for iOS Safari) */
-  --yh-vh: 1vh;
-  --yh-vh100: 100vh;
-  --yh-vw100: 100vw;
-
 }
 
 *{ box-sizing:border-box; }
-html,body{ height:100%;
-  min-height: var(--yh-vh100, 100vh);
-}
+html,body{ height:100%; }
 
 body{
   margin:0;
   background:#000;
   color: var(--text);
   overflow-x:hidden;
-  position: relative;
   font-family: 'Roboto', Arial, sans-serif;
-}
-
-h1{
-  font-size: clamp(40px, 5vw, 72px);
-  line-height: 1.05;
 }
 
 input, button, textarea, select{
   font-family: 'Roboto', Arial, sans-serif;
 }
-.home-nav-btn{
-  position: fixed;
-  top: 16px;
-  right: 200px;
-  z-index: 10;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: rgba(0,0,0,.35);
-  color: var(--text);
-  text-decoration: none;
-  font-size: 13px;
-  backdrop-filter: blur(12px);
-  transition: transform .12s ease, border-color .2s ease, box-shadow .2s ease;
-}
 
-.home-nav-btn:hover{
-  border-color: var(--focus);
-  box-shadow: 0 0 0 4px var(--glow);
-  transform: translateY(-1px);
-}
-
-/* Background image */
-body::before{
-  content:"";
+/* =========================
+   VIDEO BACKGROUND
+   ========================= */
+.bgVideoWrap{
   position: fixed;
   inset: 0;
-  background: url("./assets/yhbanner.png") center / cover no-repeat;
-  opacity: 1;
-  filter: blur(0px);
+  z-index: -2;
+  overflow: hidden;
+  background: #000;
   pointer-events: none;
-  z-index: 0;
+  opacity: 0;
+  transition: opacity 380ms ease;
+}
+body.video-ready .bgVideoWrap{ opacity: 1; }
+
+.bgVideo{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.2);
+
+  /* BRIGHTNESS UP (konti) */
+  filter: brightness(1.05) contrast(1.05) saturate(1.08);
+}
+
+.bgVideoOverlay{
+  position:absolute;
+  inset:0;
+  background:
+    /* top brightness lift (para di super dark sa taas) */
+    linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.08) 0%,
+      rgba(255,255,255,0.00) 26%
+    ),
+
+    /* existing glow */
+    radial-gradient(
+      ellipse at 50% 72%,
+      rgba(100,233,238,0.18),
+      rgba(0,0,0,0) 58%
+    ),
+
+    /* darker control pero mas light na ang upper part */
+    linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.52) 0%,
+      rgba(0,0,0,0.40) 34%,
+      rgba(0,0,0,0.82) 100%
+    );
 }
 
 
-/* Vignette */
-body::after{
-  content:"";
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(
-    circle at center,
-    rgba(0,0,0,0.20) 0%,
-    rgba(0,0,0,0.62) 58%,
-    rgba(0,0,0,0.92) 100%
-  );
-  pointer-events:none;
-  z-index: 0;
-}
-
-/* Layout wrapper */
+/* =========================
+   LAYOUT
+   ========================= */
 .wrap{
   position: relative;
   z-index: 1;
-  /* IMPORTANT: don't force full viewport height inside iframes */
-  min-height: auto;
   max-width:1100px;
   margin:0 auto;
-  /* padding vars so hero can be vertically centered reliably across breakpoints */
   --wrap-pad-top: 64px;
   --wrap-pad-bottom: 22px;
-  padding: var(--wrap-pad-top) 18px var(--wrap-pad-bottom); /* top padding gives space for the Home button */
+  padding: var(--wrap-pad-top) 18px var(--wrap-pad-bottom);
+  min-height: 100svh;
   display:flex;
   flex-direction:column;
 }
 
-/* Hero */
 .top{
   flex: 0 0 auto;
   display:flex;
   flex-direction:column;
   align-items:center;
-  position: relative;
-  isolation: isolate;
-
-  /* CENTER vertically again */
   justify-content:center;
-
   gap:12px;
   text-align:center;
-
-  /* Center hero content (headline + subhead + search) within the viewport */
-  min-height: max(360px, calc(var(--yh-vh100, 100vh) - var(--wrap-pad-top) - var(--wrap-pad-bottom)));
+  min-height: max(420px, calc(100svh - var(--wrap-pad-top) - var(--wrap-pad-bottom)));
   padding: 10px 0 18px;
 }
-
 
 .headline{
   margin:0;
   font-weight:800;
   letter-spacing:-.3px;
-  font-size: 50px;
-
-  transform-origin: 50% 140%;
-  will-change: transform, opacity, filter;
-  animation: yhFromGlow 1.05s cubic-bezier(0.15, 0.9, 0.25, 1) both;
-  animation-delay: 120ms;
+  font-size: clamp(40px, 5vw, 72px);
+  line-height: 1.05;
+  text-shadow: 0 8px 50px rgba(0,0,0,0.70);
 }
 
 .subhead{
@@ -148,110 +125,9 @@ body::after{
   line-height:1.5;
   max-width: 640px;
   font-size: 22px;
-
-  transform-origin: 50% 140%;
-  will-change: transform, opacity, filter;
-  animation: yhFromGlow 1.05s cubic-bezier(0.15, 0.9, 0.25, 1) both;
-  animation-delay: 340ms;
+  text-shadow: 0 6px 40px rgba(0,0,0,0.55);
 }
 
-/* =========================
-   Intro animation (from glow)
-   ========================= */
-
-@keyframes yhFromGlow{
-  0%{
-    opacity: 0;
-    transform: translate3d(0, 200px, 0) scale(0.72);
-    filter: blur(10px);
-  }
-  55%{
-    opacity: 1;
-    transform: translate3d(0, 10px, 0) scale(0.98);
-    filter: blur(2px);
-  }
-  100%{
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(0);
-  }
-}
-
-@keyframes yhSearchExpand{
-  0%{
-    opacity: 0;
-    transform: translate3d(0, 200px, 0) scaleX(0.18) scaleY(0.86);
-    filter: blur(12px);
-  }
-  55%{
-    opacity: 1;
-    transform: translate3d(0, 14px, 0) scaleX(1.02) scaleY(0.98);
-    filter: blur(2px);
-  }
-  100%{
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scaleX(1) scaleY(1);
-    filter: blur(0);
-  }
-}
-
-@keyframes yhSourceGlow{
-  0%{
-    opacity: 0;
-    transform: translateX(-50%) scale(0.20);
-  }
-  35%{
-    opacity: 0.85;
-    transform: translateX(-50%) scale(1);
-  }
-  100%{
-    opacity: 0;
-    transform: translateX(-50%) scale(1.25);
-  }
-}
-
-.top::before{
-  content:"";
-  position:absolute;
-  left: 50%;
-  bottom: clamp(40px, 10vh, 300px);;
-  width: min(560px, 86vw);
-  aspect-ratio: 1 / 1;
-  background: radial-gradient(
-    circle at center,
-    rgba(100,233,238,0.32) 0%,
-    rgba(100,233,238,0.14) 16%,
-    rgba(100,233,238,0.00) 60%
-  );
-  filter: blur(18px);
-  opacity: 0;
-  transform: translateX(-50%) scale(0.20);
-  pointer-events:none;
-  z-index: 0;
-  mix-blend-mode: screen;
-  animation: yhSourceGlow 1.35s ease-out both;
-  animation-delay: 80ms;
-}
-
-.top > *{
-  position: relative;
-  z-index: 1;
-}
-
-@media (prefers-reduced-motion: reduce){
-  .headline,
-  .subhead,
-  .searchCard,
-  .top::before{
-    animation: none !important;
-    transform: none !important;
-    filter: none !important;
-    opacity: 1 !important;
-  }
-}
-
-
-/* Search card */
 .searchCard{
   width:min(820px, 100%);
   padding:14px;
@@ -260,12 +136,8 @@ body::after{
   border:1px solid var(--line);
   box-shadow: 0 26px 60px rgba(0,0,0,.6);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   margin-top: 15px;
-
-  transform-origin: 50% 140%;
-  will-change: transform, opacity, filter;
-  animation: yhSearchExpand 1.20s cubic-bezier(0.15, 0.9, 0.25, 1) both;
-  animation-delay: 580ms;
 }
 
 .searchRow{
@@ -274,7 +146,7 @@ body::after{
   gap:10px;
 }
 
-input{
+#q{
   width:100%;
   height:48px;
   padding:0 14px;
@@ -286,31 +158,11 @@ input{
   font-size: 15.5px;
 }
 
-input:focus{
+#q:focus{
   border-color: var(--focus);
   box-shadow: 0 0 0 4px var(--glow);
 }
 
-/* Specific styling for Textarea to match Input */
-textarea {
-  width: 100%;
-  min-height: 100px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  outline: none;
-  background: rgba(0,0,0,.35);
-  color: var(--text);
-  font-size: 15.5px;
-  resize: vertical;
-}
-
-textarea:focus {
-  border-color: var(--focus);
-  box-shadow: 0 0 0 4px var(--glow);
-}
-
-/* Go button */
 .goBtn{
   height:48px;
   width:48px;
@@ -330,10 +182,7 @@ textarea:focus {
   border-color: var(--focus);
   box-shadow: 0 0 0 4px var(--glow);
 }
-
-.goBtn:active{
-  transform: translateY(1px);
-}
+.goBtn:active{ transform: translateY(1px); }
 
 .goIcon{
   font-size:22px;
@@ -341,7 +190,6 @@ textarea:focus {
   transform: translateX(1px);
 }
 
-/* Hint row */
 .hintRow{
   display:flex;
   gap:8px;
@@ -360,10 +208,40 @@ textarea:focus {
   font-size: 12px;
 }
 
-/* Results area */
+.exploreRow{
+  width:min(820px, 100%);
+  margin-top: 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: 10px;
+  flex-wrap: wrap;
+  text-align:center;
+}
+.exploreText{ color: rgba(234,240,255,.85); }
+.exploreBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.18);
+  color:#fff;
+  text-decoration:none;
+  font-weight: 700;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.42);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.exploreBtn:hover{ transform: translateY(-1px); background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.26); }
+.exploreBtn:active{ transform: translateY(0px); }
+
 .content{
   width:min(820px, 100%);
   margin: 12px auto 0;
+  padding-bottom: 6px;
 }
 
 .list{
@@ -377,6 +255,7 @@ textarea:focus {
   border:1px solid var(--line);
   overflow:hidden;
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 18px 45px rgba(0,0,0,.55);
 }
 
@@ -388,9 +267,7 @@ textarea:focus {
   cursor:pointer;
 }
 
-.cardHead:hover{
-  background: var(--glass2);
-}
+.cardHead:hover{ background: var(--glass2); }
 
 .qTitle{
   margin:0;
@@ -413,6 +290,7 @@ textarea:focus {
   line-height:1.55;
   display:none;
   font-size: 14.8px;
+  white-space: pre-wrap;
 }
 
 .card.open .answer{ display:block; }
@@ -425,93 +303,73 @@ textarea:focus {
   color: var(--muted);
   text-align:center;
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 18px 45px rgba(0,0,0,.55);
 }
 
-.hidden{ display:none; }
+.hidden{ display:none !important; }
 
-/* Footer */
-.footer{
-  margin-top: 22px; /* normal spacing, not forced to bottom */
-  padding-top:16px;
-  border-top:1px solid rgba(234,240,255,.10);
-  color:var(--muted);
-  font-size: 13px;
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  align-items:center;
-  flex-wrap:wrap;
+.cardBody{ padding: 16px; }
+.closeBtn{
+  width:34px; height:34px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background: rgba(0,0,0,.25);
+  color: rgba(234,240,255,.9);
+  cursor:pointer;
 }
 
-
-.dot{ opacity:.6; }
-
-/* ===== Form UI ===== */
-
-label {
-  display: block;
-  margin-bottom: 12px;
+.form{ display:flex; flex-direction:column; gap:12px; margin-top: 10px; }
+.grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+.field label{
+  display:block;
+  margin-bottom: 6px;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
 }
-
-label input, label textarea {
-  display: block;
-  margin-top: 6px;
+.field input, .field textarea{
+  width:100%;
+  padding: 12px 14px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  outline:none;
+  background: rgba(0,0,0,.35);
+  color:var(--text);
+  font-size: 15.5px;
 }
-
-/* Add spacing between last field and submit */
-#connectForm{
-  margin-top: 10px;
+.field input:focus, .field textarea:focus{
+  border-color: var(--focus);
+  box-shadow: 0 0 0 4px var(--glow);
 }
+.field textarea{ resize: vertical; min-height: 110px; }
 
-#connectForm button[type="submit"]{
+.submitBtn{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: 14px;
+  margin-top: 4px;
   padding: 12px 18px;
-  border-radius: 14px;
+  border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.18);
   background: rgba(0,0,0,0.22);
   color: var(--text);
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.2px;
   box-shadow: 0 14px 30px rgba(0,0,0,0.35);
   transition: transform .12s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
-
-#connectForm button[type="submit"]:hover{
+.submitBtn:hover{
   background: rgba(0,0,0,0.30);
   border-color: rgba(255,255,255,0.28);
   box-shadow: 0 18px 38px rgba(0,0,0,0.42);
   transform: translateY(-1px);
 }
+.submitBtn:active{ transform: translateY(0); }
+.submitBtn[disabled]{ opacity: 0.72; cursor: not-allowed; transform:none; }
 
-#connectForm button[type="submit"]:active{
-  transform: translateY(0);
-}
-
-#connectForm button[type="submit"]:focus-visible{
-  outline: 2px solid rgba(120,200,255,0.70);
-  outline-offset: 2px;
-}
-
-/* Disabled/loading state */
-#connectForm button[type="submit"][disabled]{
-  opacity: 0.72;
-  cursor: not-allowed;
-  transform: none;
-}
-
-#connectForm button[type="submit"].is-loading{
-  pointer-events: none;
-}
-
-#connectForm button[type="submit"].is-loading::after{
+.submitBtn.is-loading::after{
   content: "";
   width: 14px;
   height: 14px;
@@ -522,452 +380,156 @@ label input, label textarea {
   animation: askYHSpin .9s linear infinite;
 }
 
-@keyframes askYHSpin{
-  to{ transform: rotate(360deg); }
+@keyframes askYHSpin{ to{ transform: rotate(360deg); } }
+
+.status{
+  margin-top: 6px;
+  font-size: 13px;
+  color: rgba(234,240,255,.85);
 }
 
-@media (max-width:640px){
-  .wrap{
-    --wrap-pad-top: 0px;
-    --wrap-pad-bottom: 18px;
-    padding: var(--wrap-pad-top) 14px var(--wrap-pad-bottom);
-  }
-  .headline{ font-size: 24px; }
-  .subhead{ font-size: 13px; }
-  input, textarea{ font-size: 15px; }
-
-  body::before{
-    background-size: 320px;
-    opacity: 1;
-  }
-}
-/* When the iframe/viewport height is short, scale spacing down */
-@media (max-height: 720px){
-  .wrap{ --wrap-pad-top: 54px; }
-  .headline{ font-size: 38px; }
-  .subhead{ font-size: 16px; max-width: 560px; }
-  .top{ min-height: max(320px, calc(100vh - var(--wrap-pad-top) - var(--wrap-pad-bottom))); }
-  .searchCard{ margin-top: 10px; }
-}
-/* Hide scrollbar but keep scroll */
-body{
-  -ms-overflow-style: none;   /* IE/Edge legacy */
-  scrollbar-width: none;      /* Firefox */
-}
-body::-webkit-scrollbar{
-  width: 0;
-  height: 0;
-}
-
-/* ===========================
-   MOBILE OVERRIDES (APPEND)
-   =========================== */
-
-/* General mobile (phones + small tablets) */
-@media (max-width: 640px) {
-
-  /* iOS/Safari viewport fix: use "small viewport height" */
-  body{
-    min-height: 100svh;
-  }
-
-  /* Give breathing room + avoid content sitting too low */
-  .wrap{
-    /* keep it comfortable on phones */
-    --wrap-pad-top: 64px;   /* space for the fixed "Go to Homepage" button */
-    --wrap-pad-bottom: 16px;
-    padding: var(--wrap-pad-top) 14px var(--wrap-pad-bottom);
-  }
-
-  .top{
-    /* use svh so iPhones don't add extra hidden height */
-    min-height: calc(100svh - var(--wrap-pad-top) - var(--wrap-pad-bottom));
-    justify-content: flex-start;
-    padding-top: 10px;
-  }
-
-  /* FIX: your current mobile rule sets background-size: 320px (causes big empty black space).
-     Override it back to cover and adjust position for better framing. */
-  body::before{
-    background-size: cover;
-    background-position: center 22%;
-    opacity: 1;
-  }
-
-  /* Make the fixed button safer + more consistent on small widths */
-  .home-nav-btn{
-    top: 12px;
-    right: 12px;
-    padding: 10px 12px;
-    font-size: 13px;
-    border-radius: 12px;
-  }
-
-  /* Typography tweaks */
-  .headline{
-    font-size: 22px;
-    line-height: 1.15;
-    margin-bottom: 8px;
-  }
-
-  .subhead{
-    font-size: 12.5px;
-    line-height: 1.45;
-    max-width: 34ch;
-  }
-
-  /* Card spacing/shape */
-  .searchCard{
-    margin-top: 16px;
-    padding: 12px 12px 14px;
-    border-radius: 18px;
-  }
-
-  /* Chips wrap better on phones */
-  .hintRow{
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px;
-  }
-
-  .hint{
-    font-size: 12px;
-    padding: 7px 10px;
-  }
-}
-
-/* Very small phones (iPhone width range) */
-@media (max-width: 420px) {
-  /* Stack input + button so it never feels cramped */
-  .searchRow{
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  #goBtn{
-    width: 100%;
-    height: 44px;
-    border-radius: 14px;
-  }
-
-  .searchInput{
-    padding: 12px 14px;
-  }
-}
-
-/* iOS fallback: helps Safari treat height correctly in some cases */
-@supports (-webkit-touch-callout: none) {
-  html, body{
-    height: -webkit-fill-available;
-  }
-}
-/* =========================
-   MOBILE: push content lower
-   (append at END of styles.css)
-   ========================= */
-
-@media (max-width: 640px) {
-  /* give the whole page a bit more breathing room */
-  :root{
-    --wrap-pad-top: 22px;
-    --wrap-pad-bottom: 18px;
-  }
-
-  /* instead of centering vertically, start from top with extra top padding */
-  .top{
-    justify-content: flex-start;
-    padding-top: calc(env(safe-area-inset-top) + 52px);
-    padding-bottom: 14px;
-
-    /* optional: keep it tall enough while still allowing scroll content below */
-    min-height: calc(100svh - 120px);
-  }
-
-  /* spacing tweaks so headline + card sit lower and cleaner */
-  .headline{ margin-top: 0; }
-  .subhead{ margin-top: 10px; }
-  .searchCard{ margin-top: 18px; }
-}
-
-/* If very short screens (or when Safari UI eats height), reduce the top push slightly */
-@media (max-width: 640px) and (max-height: 700px) {
-  .top{
-    padding-top: calc(env(safe-area-inset-top) + 34px);
-  }
-}
-/* =========================================================
-   MOBILE CONSISTENCY PATCH (append) – iOS + small screens
-   Goals:
-   1) Stable layout on all mobile heights (iPhone address bar)
-   2) Push hero content slightly lower on mobile
-   3) Fix "cannot scroll" when the connect form opens
-      (because .answer was overflow:hidden + fixed max-height)
-   ========================================================= */
-@media (max-width: 640px){
-
-  :root{
-    /* tweak this if you want the headline/search lower */
-      
-  }
-
-  html, body{
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: none;
-  }
-
-  .home-nav-btn{
-    right: calc(env(safe-area-inset-right) + 12px);
-    top:   calc(env(safe-area-inset-top) + 12px);
-    padding: 9px 12px;
-    font-size: 12px;
-  }
-
-  .wrap{
-    max-width: 620px;
-
-    --wrap-pad-top: calc(env(safe-area-inset-top) + 18px);
-    --wrap-pad-bottom: calc(env(safe-area-inset-bottom) + 18px);
-
-    /* 4-value padding: top | right | bottom | left */
-    padding:
-      var(--wrap-pad-top)
-      calc(16px + env(safe-area-inset-right))
-      var(--wrap-pad-bottom)
-      calc(16px + env(safe-area-inset-left));
-  }
-
-  .top{
-    justify-content: flex-start;
-    padding-top: calc(18px + var(--yh-ui-nudge));
-    min-height: max(360px, calc(100svh - var(--wrap-pad-top) - var(--wrap-pad-bottom)));
-  }
-  @supports (height: 100dvh){
-    .top{
-      min-height: max(360px, calc(100dvh - var(--wrap-pad-top) - var(--wrap-pad-bottom)));
-    }
-  }
-
-  .headline{
-    font-size: clamp(26px, 6.8vw, 44px);
-    line-height: 1.08;
-  }
-
-  .subhead{
-    font-size: 12px;
-    line-height: 1.35;
-    max-width: 34ch;
-  }
-
-  .searchCard{
-    width: 100%;
-    padding: 14px;
-    border-radius: 18px;
-  }
-
-  /* IMPORTANT: font-size 16px prevents iOS auto-zoom on focus */
-  .searchInput{
-    font-size: 16px;
-    padding: 14px;
-  }
-
-  .goButton{
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
-  }
-
-  .hint{
-    font-size: 11px;
-  }
-
-  body::before{
-    background-size: cover !important;
-    background-position: 50% 35% !important;
-  }
-
-  /* FIX: this is the actual blocker of scrolling for the form */
-  #personBox.card.open .answer{
-    max-height: min(72svh, 720px);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-    overscroll-behavior: contain;
-  }
-  @supports (height: 100dvh){
-    #personBox.card.open .answer{
-      max-height: min(72dvh, 720px);
-    }
-  }
-
-  #connectForm input,
-  #connectForm textarea,
-  #connectForm select{
-    font-size: 16px;
-  }
-  /* Prevent iOS Safari zoom on focus */
-  #q{font-size:16px;}
-  input, textarea, select{font-size:16px;}
-
-}
-/* Success CTA (shown after successful connection request) */
-.success-cta{
-  width:100%;
+.underReview{
   display:flex;
-  justify-content:center;
-  margin-top: 14px;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap: 10px;
+  padding: 6px 0;
 }
-
-.explore-btn{
+.urIcon{ font-size: 22px; opacity: .95; }
+.urTitle{ font-size: 16px; font-weight: 900; letter-spacing: .2px; }
+.urBody{ font-size: 13px; line-height: 1.45; color: rgba(234,240,255,0.85); }
+.urBtn{
+  margin-top: 8px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  padding: 12px 18px;
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  background: rgba(0,0,0,.35);
-  color: var(--text);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.2);
+  color:#fff;
   text-decoration:none;
-  font-weight: 600;
-  letter-spacing: .2px;
-}
-
-.explore-btn:hover{
-  background: rgba(0,0,0,.48);
-}
-
-/* "Not looking for anyone?" helper row (default: inside search card on desktop) */
-.exploreNow{
-  margin-top: 10px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  flex-wrap:wrap;
-  color: rgba(234,240,255,.82);
-  font-size: 13.5px;
-  line-height: 1.35;
-}
-
-.exploreNowText{
-  opacity: .92;
-}
-
-.explore-btn--small{
-  padding: 10px 14px;
-  border-radius: 999px;
-  font-size: 13.5px;
-}
-
-/* Mobile: move the helper row OUTSIDE the search card (JS moves DOM + adds exploreNow--outer) */
-@media (max-width: 640px){
-  .searchCard .exploreNow{ display:none; } /* prevent weird inline layout inside card */
-  .exploreNow.exploreNow--outer{
-    display:flex;
-    width: min(520px, calc(100% - 28px));
-    margin: 12px auto 0;
-    padding: 10px 12px;
-    border-radius: 18px;
-    background: rgba(0,0,0,.18);
-    border: 1px solid rgba(234,240,255,.10);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 12px 40px rgba(0,0,0,.25);
-  }
-}
-
-/* Force-hide anything with .hidden even if later rules set display */
-.hidden{ display:none !important; }
-/* Inline version of explore button for text links */
-.explore-btn--inline{
-  display: inline;
-  padding: 0;
-  border: none;
-  background: none;
-  box-shadow: none;
-  font-weight: 600;
-  text-decoration: underline;
-}
-/* =========================================================
-   HERO Explore shortcut (outside search card) + mobile positioning
-   ========================================================= */
-
-.exploreNow{
-  margin: 14px auto 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  flex-wrap:wrap;
-  max-width: min(720px, calc(100vw - 40px));
-  padding: 10px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(0,0,0,0.26);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 18px 70px rgba(0,0,0,0.45);
-}
-
-.exploreNowText{
-  color: rgba(235,244,255,0.78);
-  font-size: 12.5px;
-  line-height: 1.2;
-  text-shadow: 0 10px 30px rgba(0,0,0,0.55);
-}
-
-a.explore-btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  height: 34px;
-  padding: 0 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.18);
-  background: rgba(0,0,0,0.38);
-  color: var(--text);
   font-weight: 800;
-  font-size: 12.5px;
-  letter-spacing: 0.2px;
-  text-decoration: none;
-  box-shadow:
-    0 0 0 1px rgba(120,170,255,0.10),
-    0 16px 60px rgba(0,0,0,0.45);
-  transition: transform 80ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
-a.explore-btn:hover{
-  background: rgba(0,0,0,0.50);
-  border-color: rgba(120,170,255,0.35);
-  box-shadow:
-    0 0 0 1px rgba(120,170,255,0.14),
-    0 18px 70px rgba(0,0,0,0.52);
+.footer{
+  margin-top: 22px;
+  padding-top:16px;
+  border-top:1px solid rgba(234,240,255,.10);
+  color:var(--muted);
+  font-size: 13px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
 }
 
-a.explore-btn:active{
-  transform: translateY(0.5px) scale(0.99);
+/* =========================
+   HERO INTRO STATES
+   ========================= */
+body.hero-prep .headline,
+body.hero-prep .subhead,
+body.hero-prep #searchCard,
+body.hero-prep #exploreRow{
+  opacity: 0;
+  transform: translateY(28px) scale(0.985);
+  filter: blur(10px);
 }
 
-a.explore-btn--mini{
-  height: 32px;
-  padding: 0 12px;
-  font-size: 12px;
+body.hero-text #searchCard,
+body.hero-text #exploreRow{
+  opacity: 0;
+  transform: translateY(26px) scale(0.985);
+  filter: blur(10px);
+  pointer-events: none;
 }
 
-/* MOBILE: lower hero closer to glow source */
+@keyframes yhFromGlow {
+  0%   { opacity: 0; transform: translateY(60px) scale(0.92); filter: blur(10px) brightness(1.6); }
+  60%  { opacity: 1; filter: blur(2px) brightness(1.1); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0) brightness(1); }
+}
+
+body.hero-text .headline,
+body.hero-text .subhead{
+  opacity: 1;
+  transform: none;
+  filter: none;
+  animation: yhFromGlow 1050ms cubic-bezier(.2,.9,.15,1) both;
+}
+
+body.hero-text .subhead{ animation-delay: 120ms; }
+
+body.hero-ui #searchCard,
+body.hero-ui #exploreRow{
+  opacity: 1;
+  transform: none;
+  filter: none;
+  pointer-events: auto;
+  transition:
+    opacity 650ms ease,
+    transform 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 650ms ease;
+}
+body.hero-ui #searchCard{ transition-delay: 160ms; }
+body.hero-ui #exploreRow{ transition-delay: 240ms; }
+
+.typing{
+  position: relative;
+  white-space: nowrap;
+}
+.typing::after{
+  content: "";
+  display: inline-block;
+  width: 0.75ch;
+  height: 1em;
+  margin-left: 0.1ch;
+  border-left: 2px solid rgba(234,240,255,0.92);
+  transform: translateY(0.12em);
+  animation: yhCaretBlink 0.9s steps(1, end) infinite;
+}
+@keyframes yhCaretBlink{
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .bgVideo{ transform: none; }
+  body.hero-prep .headline,
+  body.hero-prep .subhead,
+  body.hero-prep #searchCard,
+  body.hero-prep #exploreRow,
+  body.hero-text #searchCard,
+  body.hero-text #exploreRow{
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  body.hero-text .headline,
+  body.hero-text .subhead{ animation: none !important; }
+  .typing::after{ display:none !important; }
+}
+
+@media (max-width: 900px){
+  .headline{ font-size: clamp(34px, 6vw, 56px); }
+  .subhead{ font-size: 18px; }
+}
+
 @media (max-width: 640px){
+  .wrap{
+    --wrap-pad-top: 54px;
+    padding: var(--wrap-pad-top) 14px 18px;
+  }
   .top{
-    justify-content: flex-start;
-    padding-top: calc(clamp(120px, 18vh, 210px) + env(safe-area-inset-top));
-    padding-bottom: clamp(14px, 4vh, 26px);
+    justify-content:flex-start;
+    padding-top: clamp(160px, 24vh, 280px);
+    min-height: calc(100svh - var(--wrap-pad-top) - 18px);
   }
-
-  .exploreNow{
-    margin-top: 12px;
-    max-width: calc(100vw - 28px);
-    padding: 10px 12px;
-  }
+  .subhead{ font-size: 13px; max-width: 34ch; }
+  #q, .field input, .field textarea{ font-size: 16px; }
+  .grid2{ grid-template-columns: 1fr; }
 }
+
+body{ -ms-overflow-style: none; scrollbar-width: none; }
+body::-webkit-scrollbar{ width: 0; height: 0; }

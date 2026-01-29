@@ -1,3 +1,11 @@
+// ============================
+// Ask YH — app.js
+// UPDATE:
+// - Hero starts ONLY when video reaches data-hero-start-ms (logo starts fading)
+// - Video freezes at data-freeze-at-ms (logo fully gone) => static background
+// - Brightness handled in CSS
+// ============================
+
 const q = document.getElementById("q");
 const goBtn = document.getElementById("goBtn");
 const list = document.getElementById("list");
@@ -7,145 +15,191 @@ const empty = document.getElementById("empty");
 const personBox = document.getElementById("personBox");
 const personHead = document.getElementById("personHead");
 const personMsg = document.getElementById("personMsg");
-const timeHint = document.getElementById("timeHint");
-const successCtaWrap = document.getElementById("successCtaWrap");
 const connectForm = document.getElementById("connectForm");
 const connectStatus = document.getElementById("connectStatus");
+const closeCard = document.getElementById("closeCard");
 
 // --- URL galing sa screenshot mo (Version 4) ---
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz1mh08zgqOU-gTAgVGX7bnnLWUcdqFQXK_sYh3ZYfghlOyufvt_WT9xa9IO9mOqhpF/exec"; 
-
-
-// -------------------------------------------------------------
-// iOS Safari / Mobile viewport fix (prevents 100vh jumps in iFrames)
-// Sets CSS vars:
-//   --yh-vh   = 1% viewport height in px
-//   --yh-vh100= 100% viewport height in px
-//   --yh-vw100= 100% viewport width in px
-// -------------------------------------------------------------
-(function setupViewportVars(){
-  let raf = null;
-  const setVars = () => {
-    raf = null;
-    const vv = window.visualViewport;
-    const h = vv ? vv.height : window.innerHeight;
-    const w = vv ? vv.width : window.innerWidth;
-    document.documentElement.style.setProperty('--yh-vh', (h * 0.01) + 'px');
-    document.documentElement.style.setProperty('--yh-vh100', h + 'px');
-    document.documentElement.style.setProperty('--yh-vw100', w + 'px');
-  };
-  const schedule = () => {
-    if (raf) return;
-    raf = requestAnimationFrame(setVars);
-  };
-  setVars();
-  window.addEventListener('resize', schedule, { passive: true });
-  window.addEventListener('orientationchange', schedule, { passive: true });
-  window.addEventListener('pageshow', schedule, { passive: true });
-  document.addEventListener('visibilitychange', schedule, { passive: true });
-
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', schedule, { passive: true });
-    // On iOS the URL bar can animate without a resize; scroll listener catches that.
-    window.visualViewport.addEventListener('scroll', schedule, { passive: true });
-  }
-
-  // Keyboard open/close can be delayed; refresh shortly after focus changes.
-  window.addEventListener('focusin', () => setTimeout(schedule, 50), { passive: true });
-  window.addEventListener('focusout', () => setTimeout(schedule, 50), { passive: true });
-})();
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz1mh08zgqOU-gTAgVGX7bnnLWUcdqFQXK_sYh3ZYfghlOyufvt_WT9xa9IO9mOqhpF/exec";
 
 // Timers for the fake searching animation
 let personSearchTimeout = null;
 let personDotsInterval = null;
 
-// --- Helper Functions ---
+// -----------------------------
+// HERO INTRO (true sync to video timeline)
+// -----------------------------
+(function initHeroIntroSyncedToVideo(){
+  const headline = document.getElementById("heroHeadline");
+  const subhead  = document.getElementById("heroSubhead");
+  const searchCard = document.getElementById("searchCard");
+  const video = document.getElementById("bgVideo");
 
-// --- Hero Intro Animation (typing + synced with CSS) ---
-function prefersReducedMotion(){
-  return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
+  // If hero nodes missing, just show page
+  if (!headline || !subhead || !searchCard) {
+    document.body.classList.remove("hero-prep");
+    document.body.classList.add("video-ready", "hero-text", "hero-ui");
+    return;
+  }
 
-function typeText(el, fullText, speedMs = 26, startDelayMs = 0){
-  return new Promise((resolve) => {
-    if (!el) return resolve();
-    const text = (fullText || "").toString();
-    let i = 0;
+  const fullH = headline.textContent.trim();
+  const fullS = subhead.textContent.trim();
 
-    const start = () => {
-      const timer = setInterval(() => {
-        i += 1;
-        el.textContent = text.slice(0, i);
-        if (i >= text.length) {
-          clearInterval(timer);
-          resolve();
-        }
-      }, Math.max(10, speedMs));
-    };
+  const prefersReduced =
+    window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (startDelayMs > 0) setTimeout(start, startDelayMs);
-    else start();
-  });
-}
+  // Timing (ms) from HTML
+  const heroStartMs = Number(video?.dataset?.heroStartMs || 2500);
+  const freezeAtMs  = Number(video?.dataset?.freezeAtMs  || 3300);
 
-function typePlaceholder(inputEl, fullText, speedMs = 16, startDelayMs = 0){
-  if (!inputEl) return;
-  const text = (fullText || "").toString();
-  let i = 0;
+  const heroStartS = heroStartMs / 1000;
+  const freezeAtS  = freezeAtMs / 1000;
 
-  const start = () => {
-    const timer = setInterval(() => {
+  const typeText = (el, text, speed, done) => {
+    if (prefersReduced) {
+      el.textContent = text;
+      done && done();
+      return;
+    }
+    el.textContent = "";
+    el.classList.add("typing");
+
+    let i = 1;
+    const tick = () => {
+      el.textContent = text.slice(0, i);
       i += 1;
-      inputEl.setAttribute("placeholder", text.slice(0, i));
-      if (i >= text.length) clearInterval(timer);
-    }, Math.max(10, speedMs));
+      if (i <= text.length) {
+        window.setTimeout(tick, speed);
+      } else {
+        el.textContent = text;
+        el.classList.remove("typing");
+        done && done();
+      }
+    };
+    tick();
   };
 
-  // keep a tiny placeholder so the field doesn't look "broken" during the delay
-  inputEl.setAttribute("placeholder", " ");
+  let heroStarted = false;
+  let frozen = false;
 
-  if (startDelayMs > 0) setTimeout(start, startDelayMs);
-  else start();
-}
+  const startHero = () => {
+    if (heroStarted) return;
+    heroStarted = true;
 
-function runHeroIntro(){
-  // Don't run if user prefers reduced motion
-  if (prefersReducedMotion()) return;
+    document.body.classList.add("video-ready");
+    document.body.classList.remove("hero-prep");
+    document.body.classList.add("hero-text");
 
-  const headlineEl = document.querySelector(".headline");
-  const subheadEl = document.querySelector(".subhead");
-
-  if (!headlineEl || !subheadEl) return;
-  if (headlineEl.dataset.introDone === "1") return;
-
-  const headlineText = (headlineEl.dataset.fullText || headlineEl.textContent || "").trim();
-  const subheadText = (subheadEl.dataset.fullText || subheadEl.textContent || "").trim();
-
-  // store originals once
-  headlineEl.dataset.fullText = headlineText;
-  subheadEl.dataset.fullText = subheadText;
-
-  headlineEl.textContent = "";
-  subheadEl.textContent = "";
-
-  // Typing sequence (synced with CSS entrance delays)
-  typeText(headlineEl, headlineText, 28, 260)
-    .then(() => typeText(subheadEl, subheadText, 16, 120))
-    .finally(() => {
-      headlineEl.dataset.introDone = "1";
+    typeText(headline, fullH, 42, () => {
+      typeText(subhead, fullS, 26, () => {
+        document.body.classList.add("hero-ui");
+      });
     });
+  };
 
-  // Optional: type the placeholder prompt as well
-  if (q) {
-    const ph = (q.dataset.fullPlaceholder || q.getAttribute("placeholder") || "").trim();
-    q.dataset.fullPlaceholder = ph || q.dataset.fullPlaceholder || "";
-    if (q.dataset.fullPlaceholder) {
-      typePlaceholder(q, q.dataset.fullPlaceholder, 14, 720);
+  const freezeVideo = () => {
+    if (frozen) return;
+    frozen = true;
+
+    if (!video) return;
+
+    try {
+      // clamp freeze time to avoid seeking beyond duration
+      const dur = Number.isFinite(video.duration) ? video.duration : null;
+      const safeFreeze = dur ? Math.min(freezeAtS, Math.max(0, dur - 0.05)) : freezeAtS;
+
+      // force to the "logo already gone" frame, then pause (static)
+      if (Number.isFinite(safeFreeze)) {
+        video.currentTime = safeFreeze;
+      }
+      video.loop = false;
+      video.pause();
+    } catch (_) {}
+  };
+
+  // Real sync loop based on video timeline
+  const tickSync = () => {
+    if (!video) return;
+
+    const t = video.currentTime || 0;
+
+    // Show video as soon as we have frames
+    if (!document.body.classList.contains("video-ready") && t >= 0) {
+      document.body.classList.add("video-ready");
     }
+
+    // Start hero only when logo is starting to fade
+    if (!heroStarted && t >= heroStartS) startHero();
+
+    // Freeze after logo fully gone
+    if (!frozen && t >= freezeAtS) freezeVideo();
+  };
+
+  const begin = () => {
+    // If reduced motion, still respect timing but no typing
+    if (prefersReduced) {
+      document.body.classList.add("video-ready");
+      const revealAt = heroStartMs;
+
+      window.setTimeout(() => {
+        document.body.classList.remove("hero-prep");
+        document.body.classList.add("hero-text", "hero-ui");
+        headline.textContent = fullH;
+        subhead.textContent = fullS;
+      }, revealAt);
+
+      window.setTimeout(() => freezeVideo(), freezeAtMs);
+      return;
+    }
+
+    // keep listening frame-by-frame for accurate sync
+    if (video && typeof video.requestVideoFrameCallback === "function") {
+      const onFrame = () => {
+        tickSync();
+        if (!frozen) video.requestVideoFrameCallback(onFrame);
+      };
+      video.requestVideoFrameCallback(onFrame);
+    } else {
+      const iv = window.setInterval(() => {
+        tickSync();
+        if (frozen) window.clearInterval(iv);
+      }, 40);
+    }
+
+    // fallback: if video never plays, reveal anyway (but still tries to freeze)
+    window.setTimeout(() => {
+      if (!heroStarted) startHero();
+    }, heroStartMs + 1200);
+  };
+
+  if (video) {
+    // ensure consistent start
+    video.addEventListener("loadedmetadata", () => {
+      try { video.currentTime = 0; } catch (_) {}
+    }, { once: true });
+
+    // attempt autoplay (muted, so usually allowed)
+    try { video.play().catch(() => {}); } catch (_) {}
+
+    // start sync when it begins playing or canplay
+    video.addEventListener("playing", begin, { once: true });
+    video.addEventListener("canplay", () => document.body.classList.add("video-ready"), { once: true });
+    video.addEventListener("loadeddata", () => document.body.classList.add("video-ready"), { once: true });
+
+    // if autoplay blocked, still begin syncing (it will fallback)
+    window.setTimeout(() => begin(), 700);
+
+    video.addEventListener("error", () => {
+      document.body.classList.add("video-ready");
+      startHero();
+    }, { once: true });
+  } else {
+    document.body.classList.add("video-ready");
+    window.setTimeout(() => startHero(), 200);
   }
-}
+})();
 
-
+// --- Helper Functions ---
 function normalize(s) {
   return (s || "").toString().toLowerCase().trim();
 }
@@ -169,7 +223,6 @@ function meaningfulTokens(s) {
   return tokenize(s).filter(t => t.length > 2 && !STOPWORDS.has(t));
 }
 
-
 function scoreItem(item, query) {
   if (!query) return 0;
   const t = normalize(item.title);
@@ -190,18 +243,19 @@ function scoreItem(item, query) {
 }
 
 function render(items) {
+  if (!list) return;
   list.innerHTML = "";
-
-  if (successCtaWrap) successCtaWrap.classList.add("hidden");
   for (const item of items) {
     const card = document.createElement("div");
     card.className = "card";
 
     const head = document.createElement("div");
     head.className = "cardHead";
+
     const title = document.createElement("h3");
     title.className = "qTitle";
     title.textContent = item.title;
+
     const chev = document.createElement("div");
     chev.className = "chev";
     chev.textContent = "▾";
@@ -224,18 +278,19 @@ function hideOutputs() {
   if (personSearchTimeout) clearTimeout(personSearchTimeout);
   if (personDotsInterval) clearInterval(personDotsInterval);
 
-  list.classList.add("hidden");
-  empty.classList.add("hidden");
-  list.innerHTML = "";
+  if (list) {
+    list.classList.add("hidden");
+    list.innerHTML = "";
+  }
+  if (empty) empty.classList.add("hidden");
 
-  // Reset Person Box state slightly but don't close it if it's open
   if (personBox) {
     personBox.classList.add("hidden");
+    personBox.classList.remove("open");
   }
 }
 
 // --- Logic to detect "Person Search" ---
-
 function looksLikeSpecificPersonQuery(raw) {
   const s = normalize(raw);
   if (!s) return false;
@@ -266,8 +321,8 @@ function looksLikeSpecificPersonQuery(raw) {
 }
 
 function extractPersonTarget(raw) {
-  let q = (raw || "").trim().replace(/\s+/g, " ");
-  q = q.replace(/[?!.]+\s*$/, "");
+  let qx = (raw || "").trim().replace(/\s+/g, " ");
+  qx = qx.replace(/[?!.]+\s*$/, "");
   const patterns = [
     /^do\s+(you|u)\s+know\s+/i,
     /^who\s+is\s+/i,
@@ -278,62 +333,47 @@ function extractPersonTarget(raw) {
     /^reach\s+/i,
     /^introduce\s+(me\s+)?to\s+/i,
   ];
-  for (const p of patterns) q = q.replace(p, "");
-  return q.trim() || (raw || "").trim();
+  for (const p of patterns) qx = qx.replace(p, "");
+  return qx.trim() || (raw || "").trim();
 }
 
 function showPersonFlow(raw) {
   if (!personBox) return;
+
   if (personSearchTimeout) clearTimeout(personSearchTimeout);
   if (personDotsInterval) clearInterval(personDotsInterval);
 
-  list.classList.add("hidden");
-  empty.classList.add("hidden");
-  list.innerHTML = "";
+  if (list) {
+    list.classList.add("hidden");
+    list.innerHTML = "";
+  }
+  if (empty) empty.classList.add("hidden");
 
   personBox.classList.remove("hidden");
   personBox.classList.add("open");
 
-  // --- FIXED SECTION: Reset form state properly ---
   if (connectForm) {
     connectForm.reset();
     connectForm.classList.add("hidden");
-    // Important: Remove the inline 'display:none' from previous success, 
-    // but DO NOT set it to 'block' yet. Let the CSS class control it.
-    connectForm.style.display = ""; 
+    connectForm.style.display = "";
   }
-  
   if (connectStatus) {
     connectStatus.classList.add("hidden");
-    connectStatus.innerHTML = ""; 
-    connectStatus.className = "hintRow hidden"; 
+    connectStatus.textContent = "";
+    connectStatus.style.color = "";
   }
-  
-  // Reset message area (remove the Checkmark UI from previous success)
   if (personMsg) {
     personMsg.style.display = "block";
-    personMsg.className = ""; 
-    personMsg.innerHTML = ""; 
+    personMsg.innerHTML = "";
   }
-
-  // Show the "Takes less than 60 seconds" hint only when the form is ready
-  if (timeHint) timeHint.style.display = "none";
-
-      // Hide hero headline + subhead + search after successful submission
-      const heroTop = document.querySelector("header.top");
-      if (heroTop) heroTop.classList.add("hidden");
-
-
-  if (successCtaWrap) successCtaWrap.classList.add("hidden");
 
   const target = extractPersonTarget(raw);
 
-  // Auto-fill the contact person field from the search input
   const contactPersonEl = document.getElementById("contactPerson");
   if (contactPersonEl) contactPersonEl.value = target || raw;
 
   const base = target ? `Searching the YH network for "${target}"` : "Searching the YH network";
-  
+
   let dots = 0;
   if (personMsg) personMsg.textContent = base;
 
@@ -350,8 +390,7 @@ function showPersonFlow(raw) {
 
     if (personMsg) personMsg.textContent = "Complete the form below. Our team will review it and get back to you if the request qualifies.";
     if (connectForm) connectForm.classList.remove("hidden");
-    if (timeHint) timeHint.style.display = "block";
-    
+
     personBox.scrollIntoView({ behavior: "smooth", block: "center" });
   }, delayMs);
 
@@ -359,12 +398,12 @@ function showPersonFlow(raw) {
 }
 
 function runSearch() {
-  const raw = (q.value || "").trim();
+  const raw = (q?.value || "").trim();
   if (!raw) {
     hideOutputs();
-runHeroIntro();
     return;
   }
+
   if (looksLikeSpecificPersonQuery(raw)) {
     showPersonFlow(raw);
     return;
@@ -378,49 +417,57 @@ runHeroIntro();
     .map(x => x.item);
 
   if (personBox) personBox.classList.add("hidden");
-  
+
   if (!scored.length) {
-    list.classList.add("hidden");
-    empty.classList.remove("hidden");
-    empty.textContent = "No matches found.";
-    list.innerHTML = "";
+    if (list) {
+      list.classList.add("hidden");
+      list.innerHTML = "";
+    }
+    if (empty) {
+      empty.classList.remove("hidden");
+      empty.textContent = "No matches found.";
+    }
   } else {
-    empty.classList.add("hidden");
-    list.classList.remove("hidden");
+    if (empty) empty.classList.add("hidden");
+    if (list) list.classList.remove("hidden");
     render(scored);
   }
 }
 
 function handleTyping() {
-  const raw = (q.value || "").trim();
+  const raw = (q?.value || "").trim();
   if (!raw) {
     hideOutputs();
-runHeroIntro();
     return;
   }
-  // Clear person search timers if typing changes
+
   if (personSearchTimeout) clearTimeout(personSearchTimeout);
   if (personDotsInterval) clearInterval(personDotsInterval);
-  
+
   if (personBox) personBox.classList.add("hidden");
-  list.classList.add("hidden");
-  empty.classList.add("hidden");
+  if (list) list.classList.add("hidden");
+  if (empty) empty.classList.add("hidden");
 }
 
-q.addEventListener("input", handleTyping);
-q.addEventListener("keydown", (e) => {
+// Events
+q?.addEventListener("input", handleTyping);
+q?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
     runSearch();
   }
 });
-goBtn.addEventListener("click", runSearch);
+goBtn?.addEventListener("click", runSearch);
 
 if (personHead && personBox) {
-  personHead.addEventListener("click", () => {
-    personBox.classList.toggle("open");
-  });
+  personHead.addEventListener("click", () => personBox.classList.toggle("open"));
 }
+closeCard?.addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  personBox?.classList.add("hidden");
+  personBox?.classList.remove("open");
+});
 
 // -------------------------------------------------------------
 // SUBMIT LOGIC WITH SUCCESS UI
@@ -432,7 +479,6 @@ if (connectForm) {
     const formData = new FormData(connectForm);
     const data = Object.fromEntries(formData.entries());
 
-    // Basic Validation
     const missing = [];
     if (!data.firstName) missing.push("Name");
     if (!data.surname) missing.push("Surname");
@@ -449,7 +495,6 @@ if (connectForm) {
       return;
     }
 
-    // --- 1. Loading State ---
     const submitBtn = connectForm.querySelector('button[type="submit"]');
     const originalBtnText = submitBtn ? (submitBtn.dataset.originalText || submitBtn.textContent) : "Submit";
 
@@ -460,56 +505,53 @@ if (connectForm) {
       submitBtn.textContent = "Sending...";
     }
 
-    // --- 2. Send to Google Sheets ---
     fetch(WEB_APP_URL, {
       method: "POST",
       body: formData
     })
-    .then(res => res.text()) // Use text() first to avoid JSON parse errors on redirects
-    .then(text => {
-      // --- 3. SUCCESS UI ---
-      // Hide the form completely
+    .then(res => res.text())
+    .then(() => {
+      connectForm.classList.add("hidden");
       connectForm.style.display = "none";
-      if (timeHint) timeHint.style.display = "none";
-      
-      // Update the message area to show Big Success
+
+      if (personBox) personBox.dataset.mode = "success";
+
+      document.body.classList.add("yhSuccess");
+      const h1 = document.getElementById("heroHeadline");
+      const sh = document.getElementById("heroSubhead");
+      const sc = document.getElementById("searchCard");
+      const er = document.getElementById("exploreRow");
+      if (h1) h1.classList.add("hidden");
+      if (sh) sh.classList.add("hidden");
+      if (sc) sc.classList.add("hidden");
+      if (er) er.classList.add("hidden");
+
       if (personMsg) {
+        const safeEmail = (data.email || "").replace(/</g, "&lt;");
         personMsg.innerHTML = `
-          <div style="text-align:center; padding: 20px 0;">
-            <div style="font-size: 40px; margin-bottom: 10px;">⏳</div>
-            <h3 style="margin:0 0 10px; color:#EAF0FF;">Request Under Review</h3>
-
-            <p style="margin:0 0 12px; font-size:14px; color:rgba(234,240,255,.8); line-height:1.45;">
+          <div class="underReview">
+            <div class="urIcon" aria-hidden="true">⏳</div>
+            <div class="urTitle">Request Under Review</div>
+            <div class="urBody">
               Your request has been successfully received.<br/>
-              Our team is currently reviewing your information.
-            </p>
-
-            <p style="margin:0 0 12px; font-size:14px; color:rgba(234,240,255,.7); line-height:1.45;">
-              If approved, a representative will contact you at <strong>oscarschulzbusiness@gmail.com</strong>.<br/>
-              Please allow up to 48 hours for review.
-            </p>
-
-            <p style="margin:0 0 12px; font-size:14px; color:rgba(234,240,255,.7); line-height:1.45;">
-              Due to high demand, not all requests are approved.
-            </p>
-
-            <p style="margin:0; font-size:14px; color:rgba(234,240,255,.7); line-height:1.45;">
-              In the meantime, you may <a class="explore-btn" href="https://www.younghustlers.net/main" target="_top" rel="noopener" onclick="window.open(this.href, '_top'); return false;">Explore Young Hustlers</a>
-            </p>
+              Our team is currently reviewing your information.<br/><br/>
+              If approved, a representative will contact you at <b>${safeEmail}</b>.<br/>
+              Please allow up to 48 hours for review.<br/><br/>
+              Due to high demand, not all requests are approved.<br/><br/>
+              In the meantime, you may explore Young Hustlers.
+            </div>
+            <a class="urBtn" href="https://www.younghustlers.net/main" target="_top" rel="noopener">Explore Young Hustlers</a>
           </div>
         `;
       }
-
-      if (successCtaWrap) successCtaWrap.classList.remove("hidden");
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       if (connectStatus) {
         connectStatus.textContent = "Error submitting. Please try again.";
         connectStatus.classList.remove("hidden");
-        connectStatus.style.color = "#ff6b6b"; 
+        connectStatus.style.color = "#ff6b6b";
       }
-      // Re-enable button so they can try again
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.classList.remove("is-loading");
@@ -519,45 +561,5 @@ if (connectForm) {
   });
 }
 
-
-
-// --- Mobile-only layout fix: move the "Not looking for anyone?" row OUTSIDE the search card ---
-(function setupExploreNowPlacement(){
-  const exploreNow = document.querySelector(".exploreNow");
-  const searchCard = document.querySelector(".searchCard");
-  const heroTop = document.querySelector("header.top");
-  if (!exploreNow || !searchCard || !heroTop) return;
-
-  function placeExploreNowForMobile(){
-    const isMobile = window.matchMedia("(max-width: 640px)").matches;
-    if (isMobile){
-      // Move outside the search card (still inside header) so it doesn't look cramped on small screens
-      if (exploreNow.parentElement === searchCard){
-        searchCard.insertAdjacentElement("afterend", exploreNow);
-      }
-      exploreNow.classList.add("exploreNow--outer");
-    } else {
-      // Restore inside the card on larger screens
-      if (exploreNow.parentElement !== searchCard){
-        const searchRow = searchCard.querySelector(".searchRow");
-        if (searchRow) searchRow.insertAdjacentElement("afterend", exploreNow);
-        else searchCard.appendChild(exploreNow);
-      }
-      exploreNow.classList.remove("exploreNow--outer");
-    }
-  }
-
-  let t;
-  function schedule(){
-    clearTimeout(t);
-    t = setTimeout(placeExploreNowForMobile, 80);
-  }
-
-  placeExploreNowForMobile();
-  window.addEventListener("resize", schedule, { passive:true });
-  window.addEventListener("orientationchange", schedule, { passive:true });
-})();
-
-
+// Initial UI state
 hideOutputs();
-runHeroIntro();
