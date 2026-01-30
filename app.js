@@ -513,8 +513,8 @@ if (connectForm) {
     if (!data.surname) missing.push("Surname");
     if (!data.email) missing.push("Email");
     if (!data.age) missing.push("Age");
-    if (!data.country) missing.push("Country");
-    if (!data.city) missing.push("City");
+    if (!data.country) missing.push("Country of residence");
+    if (!data.city) missing.push("Current city/location");
     if (!data.contactPerson) missing.push("Who you're trying to contact");
     if (!data.profession) missing.push("Profession");
     if (!data.experience) missing.push("Past Experience");
