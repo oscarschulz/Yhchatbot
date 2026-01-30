@@ -312,6 +312,7 @@ body.video-ready .bgVideoWrap{ opacity: 1; }
 .hidden{ display:none !important; }
 
 .cardBody{ padding: 16px; }
+.personMsg{ padding-bottom: 6px; }
 .closeBtn{
   width:34px; height:34px;
   border-radius:12px;
@@ -321,7 +322,7 @@ body.video-ready .bgVideoWrap{ opacity: 1; }
   cursor:pointer;
 }
 
-.form{ display:flex; flex-direction:column; gap:12px; margin-top: 10px; }
+.form{ display:flex; flex-direction:column; gap:12px; margin-top: 16px; }
 .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
 .field label{
   display:block;
@@ -538,4 +539,4 @@ body::-webkit-scrollbar{ width: 0; height: 0; }
 
 
 /* iOS: kapag nag-scroll papunta sa form, wag masyadong dikit sa taas */
-#personBox{ scroll-margin-top: 18px; }
+#personBox{ scroll-margin-top: 16px; }

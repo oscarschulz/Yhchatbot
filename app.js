@@ -518,6 +518,7 @@ if (connectForm) {
     if (!data.contactPerson) missing.push("Who you're trying to contact");
     if (!data.profession) missing.push("Profession");
     if (!data.experience) missing.push("Past Experience");
+    if (!data.purpose) missing.push("Purpose");
 
     if (missing.length) {
       alert("Please fill: " + missing.join(", "));
