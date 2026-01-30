@@ -92,8 +92,10 @@ body.video-ready .bgVideoWrap{ opacity: 1; }
   margin:0 auto;
   --wrap-pad-top: 64px;
   --wrap-pad-bottom: 22px;
-  padding: var(--wrap-pad-top) 18px var(--wrap-pad-bottom);
+  padding: calc(var(--wrap-pad-top) + env(safe-area-inset-top)) 18px calc(var(--wrap-pad-bottom) + env(safe-area-inset-bottom));
+  min-height: 100vh;
   min-height: 100svh;
+  min-height: 100dvh;
   display:flex;
   flex-direction:column;
 }
@@ -519,7 +521,7 @@ body.hero-ui #exploreRow{ transition-delay: 240ms; }
 @media (max-width: 640px){
   .wrap{
     --wrap-pad-top: 54px;
-    padding: var(--wrap-pad-top) 14px 18px;
+    padding: calc(var(--wrap-pad-top) + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom));
   }
   .top{
     justify-content:flex-start;
@@ -533,3 +535,7 @@ body.hero-ui #exploreRow{ transition-delay: 240ms; }
 
 body{ -ms-overflow-style: none; scrollbar-width: none; }
 body::-webkit-scrollbar{ width: 0; height: 0; }
+
+
+/* iOS: kapag nag-scroll papunta sa form, wag masyadong dikit sa taas */
+#personBox{ scroll-margin-top: 18px; }

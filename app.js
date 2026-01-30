@@ -200,6 +200,30 @@ let personDotsInterval = null;
 })();
 
 // --- Helper Functions ---
+
+
+// iOS Safari: kapag focused pa rin ang search input, minsan hindi makapag-scroll palabas (pinipilit ni Safari na manatiling visible ang focused element).
+function closeKeyboard(){
+  try{
+    const ae = document.activeElement;
+    if (ae && typeof ae.blur === "function") ae.blur();
+    if (q && typeof q.blur === "function") q.blur();
+  }catch(_){}
+}
+
+// Mas stable kaysa scrollIntoView sa iOS (lalo na kapag keyboard/iframe)
+function safeScrollTo(el, offset = 16){
+  if (!el) return;
+  try{
+    const rect = el.getBoundingClientRect();
+    const top = rect.top + (window.pageYOffset || window.scrollY || 0) - offset;
+    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+  }catch(_){
+    try{ el.scrollIntoView({ behavior: "smooth", block: "start" }); }catch(__){}
+  }
+}
+
+
 function normalize(s) {
   return (s || "").toString().toLowerCase().trim();
 }
@@ -340,6 +364,8 @@ function extractPersonTarget(raw) {
 function showPersonFlow(raw) {
   if (!personBox) return;
 
+  closeKeyboard();
+
   if (personSearchTimeout) clearTimeout(personSearchTimeout);
   if (personDotsInterval) clearInterval(personDotsInterval);
 
@@ -391,10 +417,11 @@ function showPersonFlow(raw) {
     if (personMsg) personMsg.textContent = "Complete the form below. Our team will review it and get back to you if the request qualifies.";
     if (connectForm) connectForm.classList.remove("hidden");
 
-    personBox.scrollIntoView({ behavior: "smooth", block: "center" });
+    safeScrollTo(personBox, 18);
   }, delayMs);
 
-  personBox.scrollIntoView({ behavior: "smooth", block: "start" });
+  // initial nudge (para hindi ma-stuck sa hero area)
+  window.setTimeout(() => safeScrollTo(personBox, 18), 60);
 }
 
 function runSearch() {
@@ -403,6 +430,8 @@ function runSearch() {
     hideOutputs();
     return;
   }
+
+  closeKeyboard();
 
   if (looksLikeSpecificPersonQuery(raw)) {
     showPersonFlow(raw);
