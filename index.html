@@ -8,7 +8,6 @@
 </head>
 
 <body class="hero-prep">
-  <!-- Video Background -->
   <div class="bgVideoWrap" aria-hidden="true">
     <video
       class="bgVideo"
@@ -17,7 +16,6 @@
       muted
       playsinline
       preload="auto"
-      poster=""
       data-hero-start-ms="3000"
       data-logo-fade-ms="800"
       data-freeze-at-ms="5000"
@@ -34,20 +32,31 @@
 
       <div class="searchCard" id="searchCard">
         <div class="searchRow">
-          <input
-            id="q"
-            type="text"
-            placeholder='Try: "Amazon employee", "Politician in California", "Gardener in Sydney" etc.'
-            autocomplete="off"
-          />
+          <div class="inputWrapper">
+            <svg class="searchIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              id="q"
+              type="text"
+              placeholder='Try: "Amazon employee", "Politician in California"...'
+              autocomplete="off"
+            />
+          </div>
           <button id="goBtn" class="goBtn" type="button" aria-label="Search">
-            <span class="goIcon">›</span>
+            <span class="goIcon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </span>
           </button>
         </div>
 
         <div class="hintRow">
-          <span class="kbd">Enter</span>
-          <span class="hintText">to search</span>
+          <svg class="hintIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          <span class="hintText">Press Enter to search network</span>
         </div>
       </div>
 
@@ -66,23 +75,21 @@
       <div id="personBox" class="card hidden">
         <div class="cardHead" id="personHead">
           <span id="personTitle">Private Connection Request</span>
-          <button id="closeCard" class="closeBtn" type="button" aria-label="Close">▾</button>
+          <button id="closeCard" class="closeBtn" type="button" aria-label="Minimize">▾</button>
         </div>
 
         <div class="cardBody">
           <div id="personMsg" class="personMsg">
-            <p class="muted">
-              Submit a private request. If approved, someone from our team will contact you.
-            </p>
+            <p class="muted">Submit a private request. If approved, someone from our team will contact you.</p>
           </div>
 
           <form id="connectForm" class="form hidden" novalidate>
+            
             <div class="grid2">
               <div class="field">
                 <label for="firstName">Name</label>
                 <input id="firstName" name="firstName" type="text" autocomplete="given-name" required />
               </div>
-
               <div class="field">
                 <label for="surname">Surname</label>
                 <input id="surname" name="surname" type="text" autocomplete="family-name" required />
@@ -94,14 +101,12 @@
                 <label for="email">Email</label>
                 <input id="email" name="email" type="email" autocomplete="email" required />
               </div>
-
               <div class="field">
                 <label for="age">Age</label>
                 <input id="age" name="age" type="number" min="13" max="120" inputmode="numeric" required />
               </div>
             </div>
 
-            <!-- ✅ Birthdate REMOVED. Country stays clean as full-width row -->
             <div class="field">
               <label for="country">Country of residence</label>
               <input id="country" name="country" type="text" autocomplete="country-name" required />
@@ -112,7 +117,6 @@
                 <label for="city">Current city/location</label>
                 <input id="city" name="city" type="text" autocomplete="address-level2" required />
               </div>
-
               <div class="field">
                 <label for="contactPerson">Who are you trying to contact?</label>
                 <input id="contactPerson" name="contactPerson" type="text" required />
@@ -126,28 +130,18 @@
 
             <div class="field">
               <label for="experience">Past Experience</label>
-              <textarea
-                id="experience"
-                name="experience"
-                rows="4"
-                required
-                placeholder="Briefly describe your background, what you’ve done, and why you need this connection."
-              ></textarea>
+              <textarea id="experience" name="experience" rows="4" required placeholder="Describe your background..."></textarea>
             </div>
 
-            
             <div class="field">
               <label for="purpose">Purpose</label>
-              <textarea
-                id="purpose"
-                name="purpose"
-                rows="3"
-                required
-                placeholder="State clearly why you need this connection and what outcome you’re looking for."
-              ></textarea>
+              <textarea id="purpose" name="purpose" rows="3" required placeholder="Outcome you're looking for..."></textarea>
             </div>
 
-<button class="submitBtn" type="submit">Submit Request</button>
+            <div class="form-nav">
+              <button class="submitBtn" type="submit">Submit Request</button>
+            </div>
+
             <div id="connectStatus" class="status hidden" aria-live="polite"></div>
           </form>
         </div>
@@ -155,7 +149,30 @@
     </section>
 
     <footer class="footer">
-      © Young Hustlers ・ Everything &amp; Everyone, Everywhere.
+      <div class="footerMain">
+        <div class="footerLeft">
+          <img src="https://static.wixstatic.com/media/2dee4d_3d081ef27a944cf2910207f16766cc06~mv2.png/v1/fill/w_79,h_94,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/YH-removebg.png" alt="YH Logo" class="fLogo">
+        </div>
+        <div class="footerRight">
+          <nav class="footerSocials">
+            <a href="https://x.com" target="_blank" class="sLink" data-tooltip="X (Twitter)">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="https://t.me" target="_blank" class="sLink" data-tooltip="Telegram">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+            </a>
+            <a href="https://instagram.com" target="_blank" class="sLink" data-tooltip="Instagram">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 01-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 017.8 2m-.2 2A3.6 3.6 0 004 7.6v8.8A3.6 3.6 0 007.6 20h8.8a3.6 3.6 0 003.6-3.6V7.6A3.6 3.6 0 0016.4 4H7.6m4.4 3.5a4.5 4.5 0 110 9 4.5 4.5 0 010-9m0 2a2.5 2.5 0 100 5 2.5 2.5 0 000-5m4.75-1a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+            </a>
+            <a href="https://youtube.com" target="_blank" class="sLink" data-tooltip="YouTube">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </a>
+          </nav>
+        </div>
+      </div>
+      <div class="footerBottom">
+        © 2026 Young Hustlers Academy. All Rights Reserved.
+      </div>
     </footer>
   </main>
 
