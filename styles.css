@@ -13,6 +13,15 @@
 
 * { box-sizing: border-box; }
 
+/* =========================
+   HIDE SCROLLBAR (Invisible but scrollable)
+   ========================= */
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
 html, body {
   height: auto; 
   min-height: 100%;
@@ -21,7 +30,11 @@ html, body {
   overflow-y: auto;   
   background: #000;
   color: var(--text); 
-  font-family: 'Montserrat', sans-serif; 
+  font-family: 'Montserrat', sans-serif;
+  
+  /* Hides scrollbar in Firefox/IE/Edge */
+  -ms-overflow-style: none;  
+  scrollbar-width: none;  
 }
 
 /* =========================
@@ -37,8 +50,9 @@ html, body {
 }
 .bgVideoOverlay {
   position: absolute; inset: 0;
-  background: radial-gradient(circle at center, transparent 20%, rgba(0,0,0,0.2) 100%),
-              linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.4) 100%);
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(3px);
 }
 
 /* =========================
@@ -62,7 +76,8 @@ html, body {
   justify-content: center; 
   gap: 20px; 
   text-align: center;
-  transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* FIXED: Smooth transition (0.5s) */
+  transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
   padding-bottom: 5vh; 
 }
 
@@ -252,27 +267,44 @@ body:has(#personBox:not(.hidden)) .top {
 }
 .field input:focus, .field textarea:focus { border-color: var(--focus); background: rgba(0,0,0,0.8); }
 
-/* Submit Button */
+/* Submit Button FIXED - Mas maliit at centered */
 .submitBtn {
-  width: 100%; height: 60px; border-radius: 14px; border: 1px solid var(--focus);
-  background: rgba(100, 233, 238, 0.15); color: #fff; 
-  font-weight: 700; cursor: pointer; transition: 0.3s; 
-  font-family: 'Montserrat', sans-serif; letter-spacing: 1.5px; text-transform: uppercase;
-  font-size: 16px; margin-top: 10px;
+  width: auto;             /* Hindi na full width */
+  min-width: 200px;        /* Tamang size lang */
+  height: 54px;            /* Sleeker height */
+  border-radius: 14px; 
+  border: 1px solid var(--focus);
+  background: rgba(100, 233, 238, 0.15); 
+  color: #fff; 
+  font-weight: 700; 
+  cursor: pointer; 
+  transition: 0.3s; 
+  font-family: 'Montserrat', sans-serif; 
+  letter-spacing: 1.5px; 
+  text-transform: uppercase;
+  font-size: 14px;         /* Liitan font ng konti para balance */
+  margin: 20px auto 0;     /* Center horizontally */
+  display: block;          /* Required para gumana ang margin auto */
+  padding: 0 40px;         /* Padding sa gilid */
 }
+
 .submitBtn:hover { 
   background: var(--focus); color: #000; box-shadow: 0 0 25px var(--glow); 
 }
 
 /* =========================
-   FOOTER
+   FOOTER (FIXED)
    ========================= */
 .footer { 
   padding: 40px 0 20px; 
   margin-top: auto; 
   background: transparent; border: none;
-  opacity: 0; transform: translateY(30px);
-  animation: yhFadeIn 1s cubic-bezier(0.215, 0.610, 0.355, 1.000) 0.8s forwards;
+  
+  /* FIXED: Smooth entrance without glitches */
+  opacity: 0; 
+  transform: translateY(20px);
+  will-change: transform, opacity;
+  animation: footerSmooth 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.8s forwards;
 }
 
 .footerMain { 
@@ -324,7 +356,15 @@ body:has(#personBox:not(.hidden)) .top {
   animation: cardEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Original Fade In with Blur (For Text) */
 @keyframes yhFadeIn { to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+
+/* FIXED: Smooth Footer Entrance (No Blur to prevent glitch) */
+@keyframes footerSmooth { 
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); } 
+}
+
 body.hero-prep .headline, body.hero-prep .subhead, body.hero-prep #searchCard, body.hero-prep #exploreRow { opacity: 0; transform: translateY(25px); filter: blur(8px); }
 body.hero-text .headline, body.hero-text .subhead { animation: yhFadeIn 0.8s ease forwards; }
 
@@ -335,4 +375,83 @@ body.hero-text .headline, body.hero-text .subhead { animation: yhFadeIn 0.8s eas
   .wrap { padding: 0 15px 40px 15px; }
   .footerMain { flex-direction: column; gap: 30px; text-align: center; }
   .top { padding-bottom: 5vh; }
+}
+
+/* ====================================
+   SCENERY SWITCHER (New Styles)
+   ==================================== */
+.scenery-ui {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100; /* Mataas para nasa ibabaw ng lahat */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.sceneryBtn {
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--line);
+  color: #fff;
+  cursor: pointer;
+  display: grid; place-items: center;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.sceneryBtn:hover {
+  background: var(--focus);
+  color: #000;
+  box-shadow: 0 0 15px var(--glow);
+  transform: rotate(180deg); /* Cute spin effect */
+}
+
+/* MENU DROPDOWN */
+.sceneryMenu {
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(20px);
+  padding: 8px;
+  border-radius: 16px;
+  width: 160px;
+  transform-origin: top right;
+  animation: menuPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* INDIVIDUAL OPTIONS */
+.sOption {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 12px 15px;
+  text-align: right;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  transition: 0.2s;
+  border-radius: 10px;
+  margin-bottom: 2px;
+}
+
+.sOption:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sOption.active {
+  color: var(--focus); /* Cyan Color */
+  background: rgba(100, 233, 238, 0.1);
+  font-weight: 700;
+}
+
+@keyframes menuPop {
+  0% { opacity: 0; transform: scale(0.9) translateY(-10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
 }

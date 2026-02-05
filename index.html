@@ -25,6 +25,22 @@
     <div class="bgVideoOverlay"></div>
   </div>
 
+  <div class="scenery-ui">
+    <button id="sceneryBtn" class="sceneryBtn" aria-label="Change Scenery" title="Change Background">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>
+    </button>
+    
+    <div id="sceneryMenu" class="sceneryMenu hidden">
+      <button class="sOption active" data-src="yhvideo3.mp4">Default</button>
+      <button class="sOption" data-src="https://video.wixstatic.com/video/80218c_8f38a4b89e11459b9eb10e21ed3ef40f/1080p/mp4/file.mp4">Scene 1</button>
+      <button class="sOption" data-src="https://video.wixstatic.com/video/80218c_26ba78ab29f44abd87168cd0141e7986/1080p/mp4/file.mp4">Scene 2</button>
+      <button class="sOption" data-src="https://video.wixstatic.com/video/80218c_2d9f073d04604cce88927e6c2c4b13e7/1080p/mp4/file.mp4">Scene 3</button>
+    </div>
+  </div>
+
   <main class="wrap">
     <header class="top" id="hero">
       <h1 class="headline" id="heroHeadline">Who are you looking for?</h1>
@@ -155,28 +171,34 @@
         </div>
         <div class="footerRight">
           <nav class="footerSocials">
-            <a href="https://x.com" target="_blank" class="sLink" data-tooltip="X (Twitter)">
+            
+            <a href="https://x.com/young_hxstlers" target="_blank" class="sLink" data-tooltip="X (Twitter)">
               <svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             </a>
-            <a href="https://t.me" target="_blank" class="sLink" data-tooltip="Telegram">
+
+            <a href="https://t.me/younghustlersteam" target="_blank" class="sLink" data-tooltip="Telegram">
               <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
             </a>
-            <a href="https://instagram.com" target="_blank" class="sLink" data-tooltip="Instagram">
+
+            <a href="https://instagram.com/younghustlers_official" target="_blank" class="sLink" data-tooltip="Instagram">
               <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 01-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 017.8 2m-.2 2A3.6 3.6 0 004 7.6v8.8A3.6 3.6 0 007.6 20h8.8a3.6 3.6 0 003.6-3.6V7.6A3.6 3.6 0 0016.4 4H7.6m4.4 3.5a4.5 4.5 0 110 9 4.5 4.5 0 010-9m0 2a2.5 2.5 0 100 5 2.5 2.5 0 000-5m4.75-1a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
             </a>
-            <a href="https://youtube.com" target="_blank" class="sLink" data-tooltip="YouTube">
-              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+
+            <a href="mailto:info@younghustlers.net" class="sLink" data-tooltip="Email Us">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
             </a>
+
           </nav>
         </div>
       </div>
       <div class="footerBottom">
-        © 2026 Young Hustlers Academy. All Rights Reserved.
+        © 2026 Young Hustlers. All Rights Reserved.
       </div>
     </footer>
   </main>
 
   <script src="data.js"></script>
   <script src="app.js"></script>
+  <script src="toggle.js"></script>
 </body>
 </html>
