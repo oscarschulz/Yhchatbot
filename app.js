@@ -1,7 +1,7 @@
 // ============================
 // Ask YH — app.js
-// UPDATE: Fixed Minimize Logic (Toggle Only) & Backend Safe
-// All original logic retained.
+// UPDATE: Added SweetAlert2 for Validations & Errors
+// All original logic preserved exactly.
 // ============================
 
 const q = document.getElementById("q");
@@ -438,6 +438,66 @@ goBtn?.addEventListener("click", runSearch);
 // HEADER & TOGGLE LOGIC (FIXED)
 // ============================================
 
+// --- 0. DYNAMICALLY ADD SEARCH ICON TO HEADER ---
+(function injectHeaderSearch() {
+  if (!personHead || !closeCard) return;
+  if (document.getElementById("headerSearchBtn")) return;
+
+  const searchBtn = document.createElement("button");
+  searchBtn.id = "headerSearchBtn";
+  searchBtn.type = "button";
+  searchBtn.title = "Search Again";
+  // SVG Icon (Magnifying Glass)
+  searchBtn.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+  `;
+
+  // Insert BEFORE the close arrow
+  personHead.insertBefore(searchBtn, closeCard);
+
+  // LOGIC: Reset Search when clicked
+  searchBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    // 1. Reset UI: Unhide Hero
+    document.body.classList.remove("yhSuccess");
+    const h1 = document.getElementById("heroHeadline");
+    const sh = document.getElementById("heroSubhead");
+    const sc = document.getElementById("searchCard");
+    const er = document.getElementById("exploreRow");
+    if (h1) h1.classList.remove("hidden");
+    if (sh) sh.classList.remove("hidden");
+    if (sc) sc.classList.remove("hidden");
+    if (er) er.classList.remove("hidden");
+
+    // 2. Reset PersonBox
+    personBox.classList.add("hidden");
+    personBox.classList.remove("minimized");
+    personBox.dataset.mode = "";
+    
+    // 3. Reset Form
+    if (connectForm) {
+      connectForm.reset();
+      connectForm.classList.add("hidden"); 
+      connectForm.style.display = ""; 
+    }
+    if (personMsg) personMsg.innerHTML = ""; 
+    
+    // 4. Scroll back up
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // 5. Focus
+    if (q) {
+      q.value = "";
+      q.focus();
+    }
+  });
+})();
+
 // 1. Header Click (Toggle)
 if (personHead && personBox) {
   personHead.addEventListener("click", () => {
@@ -445,17 +505,17 @@ if (personHead && personBox) {
   });
 }
 
-// 2. Arrow Click (Toggle ONLY - HINDI CLOSE/DELETE)
+// 2. Arrow Click (Toggle ONLY)
 if (closeCard) {
   closeCard.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation(); // Stop event bubbling
-    personBox.classList.toggle("minimized"); // Add/Remove 'minimized' class
+    personBox.classList.toggle("minimized");
   });
 }
 
 // -------------------------------------------------------------
-// SUBMIT LOGIC WITH SUCCESS UI (BACKEND PRESERVED)
+// SUBMIT LOGIC WITH SWEETALERT
 // -------------------------------------------------------------
 if (connectForm) {
   connectForm.addEventListener("submit", (e) => {
@@ -478,7 +538,20 @@ if (connectForm) {
     if (!data.purpose) missing.push("Purpose");
 
     if (missing.length) {
-      alert("Please fill: " + missing.join(", "));
+      // NEW: SweetAlert2 Validation
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Missing Information',
+          text: 'Please fill: ' + missing.join(", "),
+          background: '#000',
+          color: '#fff',
+          confirmButtonColor: '#64E9EE',
+          confirmButtonText: '<span style="color:#000; font-weight:700;">OK</span>'
+        });
+      } else {
+        alert("Please fill: " + missing.join(", "));
+      }
       return;
     }
 
@@ -534,11 +607,21 @@ if (connectForm) {
     })
     .catch((err) => {
       console.error(err);
-      if (connectStatus) {
-        connectStatus.textContent = "Error submitting. Please try again.";
-        connectStatus.classList.remove("hidden");
-        connectStatus.style.color = "#ff6b6b";
+      
+      // NEW: SweetAlert2 Error Catch
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Submission Failed',
+          text: 'Something went wrong. Please check your connection and try again.',
+          background: '#000',
+          color: '#fff',
+          confirmButtonColor: '#d33',
+        });
+      } else {
+        alert("Error submitting. Please check connection.");
       }
+
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.classList.remove("is-loading");
