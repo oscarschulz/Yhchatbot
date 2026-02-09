@@ -986,3 +986,118 @@ hideOutputs();
   }
 })();
 
+(function initTrailerOverlay() {
+  const exploreBtn = document.getElementById("exploreBtn");
+  const overlay = document.getElementById("yhTrailerOverlay");
+  const video = document.getElementById("yhTrailerVideo");
+  const closeBtn = document.getElementById("yhTrailerClose");
+  if (!exploreBtn || !overlay || !video) return;
+
+  const SRC_MOBILE =
+    "https://video.wixstatic.com/video/2dee4d_681b94eceed843ebb241f0b7336a0f84/1080p/mp4/file.mp4";
+  const SRC_DESKTOP =
+    "https://video.wixstatic.com/video/2dee4d_f3f739a74a2f447c85884f3be918931f/1080p/mp4/file.mp4";
+
+  const getNextHref = () => exploreBtn.href || exploreBtn.getAttribute("href") || "main.html";
+  const pickSrc = () =>
+    window.matchMedia && window.matchMedia("(max-width: 768px)").matches ? SRC_MOBILE : SRC_DESKTOP;
+
+  const lockScroll = () => {
+    const y = window.scrollY || document.documentElement.scrollTop || 0;
+    document.body.dataset.yhScrollY = String(y);
+
+    document.documentElement.classList.add("yhNoScroll");
+    document.body.classList.add("yhNoScroll");
+
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${y}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+  };
+
+  const unlockScroll = () => {
+    const y = parseInt(document.body.dataset.yhScrollY || "0", 10);
+
+    document.documentElement.classList.remove("yhNoScroll");
+    document.body.classList.remove("yhNoScroll");
+
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.left = "";
+    document.body.style.right = "";
+    document.body.style.width = "";
+    delete document.body.dataset.yhScrollY;
+
+    window.scrollTo(0, y);
+  };
+
+  const preventIfOpen = (e) => {
+    if (overlay.classList.contains("isOpen")) e.preventDefault();
+  };
+  overlay.addEventListener("wheel", preventIfOpen, { passive: false });
+  overlay.addEventListener("touchmove", preventIfOpen, { passive: false });
+
+  const navigateNext = () => {
+    const href = getNextHref();
+    try {
+      window.top.location.href = href; // best for Wix embed
+    } catch (e) {
+      window.location.href = href;
+    }
+  };
+
+  const closeOverlay = (goNext = false) => {
+    overlay.classList.remove("isOpen");
+    overlay.setAttribute("aria-hidden", "true");
+
+    try {
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+    } catch (e) {}
+
+    unlockScroll();
+
+    if (goNext) navigateNext();
+  };
+
+  const openOverlay = () => {
+    lockScroll();
+
+    overlay.classList.add("isOpen");
+    overlay.setAttribute("aria-hidden", "false");
+
+    const src = pickSrc();
+    video.src = src;
+    video.playsInline = true;
+
+    // try play with sound (user clicked Explore so it usually works)
+    video.muted = false;
+    const p = video.play();
+    if (p && typeof p.catch === "function") {
+      p.catch(() => {
+        // fallback: muted autoplay
+        video.muted = true;
+        return video.play().catch(() => {});
+      });
+    }
+  };
+
+  // Click Explore => open trailer (no scroll)
+  exploreBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    openOverlay();
+  });
+
+  // End trailer => go next page
+  video.addEventListener("ended", () => closeOverlay(true));
+
+  // Close button => just close trailer
+  if (closeBtn) closeBtn.addEventListener("click", () => closeOverlay(false));
+
+  // ESC to close
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && overlay.classList.contains("isOpen")) closeOverlay(false);
+  });
+})();
