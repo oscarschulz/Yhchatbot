@@ -705,7 +705,8 @@ hideOutputs();
         display:flex; align-items:center; justify-content:center;
       }
       #${OVERLAY_ID}.yhIntroHidden{ display:none !important; }
-      #${VIDEO_ID}{ width:100%; height:100%; object-fit:cover; }
+      #${VIDEO_ID}{ width:100%; height:100%; display:block; background:#000; object-fit:contain; }
+    #${OVERLAY_ID}.yhIntroMobile #${VIDEO_ID}{ object-fit:cover; }
       .yhIntroControls{
         position:absolute; top:18px; right:18px;
         display:flex; gap:10px;
@@ -752,6 +753,7 @@ hideOutputs();
 
     overlay = document.createElement("div");
     overlay.id = OVERLAY_ID;
+    if (isMobileVisitor) overlay.classList.add("yhIntroMobile");
     overlay.className = "yhIntroHidden";
     overlay.setAttribute("aria-hidden", "true");
 
