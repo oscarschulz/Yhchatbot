@@ -643,9 +643,9 @@ hideOutputs();
   const CONFIG = {
     // NOTE: These must be PUBLICLY SERVED files in your site root (same folder as index.html)
     // Desktop (16:9)
-    introSrcDesktop: "SAMPLE%205%20-%20PROD.mp4",
+    introSrcDesktop: "https://video.wixstatic.com/video/2dee4d_f8f97962140641acaf3617d01ef66b2c/480p/mp4/file.mp4?fileUsed=false",
     // Mobile (9:16)
-    introSrcMobile: "SAMPLE%205%20-%20PROD%20MOB%20VIEW.mp4",
+    introSrcMobile: "https://video.wixstatic.com/video/2dee4d_f5bbbe56a6c642d6b4bfd8d548c7f0d8/480p/mp4/file.mp4?fileUsed=false",
 
     // If true, trailer runs only once per browser/device (stored in localStorage).
     // If false, trailer runs every time a user clicks a /main link from this page.
@@ -872,7 +872,7 @@ hideOutputs();
 
 
     // Start muted for autoplay policies
-    video.muted = false;
+    video.muted = true;
     video.currentTime = 0;
 
     const cleanupAndGo = () => {
