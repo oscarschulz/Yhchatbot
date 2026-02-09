@@ -633,3 +633,354 @@ if (connectForm) {
 
 // Initial UI state
 hideOutputs();
+
+// -------------------------------------------------------------
+// INTRO VIDEO GATE (Landing -> /main)
+// Adds a full-screen trailer overlay before navigating to /main.
+// Patch is ADDITIVE: it does not modify or remove existing logic above.
+// -------------------------------------------------------------
+(function initYHIntroGate() {
+  const CONFIG = {
+    // NOTE: These must be PUBLICLY SERVED files in your site root (same folder as index.html)
+    // Desktop (16:9)
+    introSrcDesktop: "SAMPLE%205%20-%20PROD.mp4",
+    // Mobile (9:16)
+    introSrcMobile: "SAMPLE%205%20-%20PROD%20MOB%20VIEW.mp4",
+
+    // If true, trailer runs only once per browser/device (stored in localStorage).
+    // If false, trailer runs every time a user clicks a /main link from this page.
+    playOnce: false,
+    playOnceKey: "yh_intro_seen_v2"
+  };
+
+  const STYLE_ID = "yhIntroGateStyles";
+  const OVERLAY_ID = "yhIntroOverlay";
+  const VIDEO_ID = "yhIntroVideo";
+  const SRC_ID = "yhIntroSource";
+  const SKIP_ID = "yhIntroSkip";
+  const SOUND_ID = "yhIntroSound";
+  const TAP_ID = "yhIntroTap";
+
+  // Device-aware source selection (Desktop vs Mobile)
+  function isMobileVisitor(){
+    // Modern Chromium (Client Hints)
+    try{
+      if (navigator.userAgentData && typeof navigator.userAgentData.mobile === "boolean") {
+        return navigator.userAgentData.mobile;
+      }
+    }catch(_){}
+
+    // Viewport + input modality heuristics
+    try{
+      if (window.matchMedia) {
+        if (window.matchMedia("(max-width: 820px)").matches) return true;
+        if (window.matchMedia("(pointer: coarse)").matches && window.matchMedia("(hover: none)").matches) return true;
+      }
+    }catch(_){}
+
+    // Fallback UA sniff
+    const ua = navigator.userAgent || "";
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobi/i.test(ua);
+  }
+
+  function getIntroSrc(){
+    // Debug overrides:
+    //  - ?intro=mobile  -> force mobile trailer
+    //  - ?intro=desktop -> force desktop trailer
+    try{
+      const p = new URLSearchParams(window.location.search);
+      const forced = (p.get("intro") || "").toLowerCase();
+      if (forced === "mobile") return CONFIG.introSrcMobile;
+      if (forced === "desktop") return CONFIG.introSrcDesktop;
+    }catch(_){}
+    return isMobileVisitor() ? CONFIG.introSrcMobile : CONFIG.introSrcDesktop;
+  }
+
+  function injectStyles() {
+    if (document.getElementById(STYLE_ID)) return;
+
+    const css = `
+      #${OVERLAY_ID}{
+        position:fixed; inset:0; z-index:9999; background:#000;
+        display:flex; align-items:center; justify-content:center;
+      }
+      #${OVERLAY_ID}.yhIntroHidden{ display:none !important; }
+      #${VIDEO_ID}{ width:100%; height:100%; object-fit:cover; }
+      .yhIntroControls{
+        position:absolute; top:18px; right:18px;
+        display:flex; gap:10px;
+      }
+      .yhIntroBtn{
+        padding:12px 18px; border-radius:999px;
+        border:1px solid rgba(255,255,255,0.22);
+        background:rgba(0,0,0,0.55);
+        color:#fff; font-weight:700; cursor:pointer;
+        backdrop-filter: blur(10px);
+      }
+      .yhIntroBtn:hover{
+        border-color: rgba(255,255,255,0.45);
+        background: rgba(0,0,0,0.75);
+      }
+      .yhIntroBtnGhost{ opacity:0.9; }
+      #${TAP_ID}{
+        position:absolute; inset:0;
+        display:flex; align-items:center; justify-content:center;
+        border:none;
+        background: rgba(0,0,0,0.35);
+        color:#fff; font-weight:800; font-size:18px;
+        cursor:pointer;
+      }
+      #${TAP_ID}.yhIntroHidden{ display:none !important; }
+    
+      body.yhIntroGateActive{ background:#000 !important; }
+      body.yhIntroGateActive > :not(#${OVERLAY_ID}){ visibility:hidden !important; }
+      #${OVERLAY_ID}.yhIntroLeaving{ background:#000; }
+      #${OVERLAY_ID}.yhIntroLeaving #${VIDEO_ID}{ opacity:0; transition: opacity 180ms ease; }
+`;
+
+    const style = document.createElement("style");
+    style.id = STYLE_ID;
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+
+  function ensureOverlay() {
+    let overlay = document.getElementById(OVERLAY_ID);
+    if (overlay) return overlay;
+
+    injectStyles();
+
+    overlay = document.createElement("div");
+    overlay.id = OVERLAY_ID;
+    overlay.className = "yhIntroHidden";
+    overlay.setAttribute("aria-hidden", "true");
+
+    const video = document.createElement("video");
+    video.id = VIDEO_ID;
+    video.setAttribute("playsinline", "");
+    video.muted = true;
+    video.preload = "metadata";
+
+    const source = document.createElement("source");
+    source.id = SRC_ID;
+    source.src = getIntroSrc();
+    source.type = "video/mp4";
+    video.appendChild(source);
+
+    const controls = document.createElement("div");
+    controls.className = "yhIntroControls";
+
+    const skip = document.createElement("button");
+    skip.id = SKIP_ID;
+    skip.type = "button";
+    skip.className = "yhIntroBtn";
+    skip.textContent = "Skip";
+
+    const sound = document.createElement("button");
+    sound.id = SOUND_ID;
+    sound.type = "button";
+    sound.className = "yhIntroBtn yhIntroBtnGhost";
+    sound.textContent = "Sound";
+
+    controls.appendChild(skip);
+    controls.appendChild(sound);
+
+    const tap = document.createElement("button");
+    tap.id = TAP_ID;
+    tap.type = "button";
+    tap.className = "yhIntroHidden";
+    tap.textContent = "Tap to play";
+
+    overlay.appendChild(video);
+    overlay.appendChild(controls);
+    overlay.appendChild(tap);
+
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  function normalizePathname(pathname) {
+    const p = String(pathname || "");
+    return p.replace(/\/+$/, "") || "/";
+  }
+
+  function isMainLink(rawHref) {
+    const s = String(rawHref || "").trim();
+    if (!s) return false;
+
+    if (s === "/main" || s === "main") return true;
+
+    try {
+      const u = new URL(s, window.location.href);
+      const hostOk = /(^|\.)younghustlers\.net$/i.test(u.hostname);
+      const pathOk = normalizePathname(u.pathname) === "/main";
+      return hostOk && pathOk;
+    } catch (_) {
+      return /younghustlers\.net\/main/i.test(s) || /\/main\b/i.test(s);
+    }
+  }
+
+  function markSeen() {
+    if (!CONFIG.playOnce) return;
+    try { localStorage.setItem(CONFIG.playOnceKey, "1"); } catch (_) {}
+  }
+
+  function hasSeen() {
+    if (!CONFIG.playOnce) return false;
+    try { return localStorage.getItem(CONFIG.playOnceKey) === "1"; } catch (_) { return false; }
+  }
+
+  function go(url) {
+    // Respect _top navigation (Wix embeds etc.)
+    try { window.top.location.href = url; }
+    catch (_) { window.location.href = url; }
+  }
+
+  function openIntro(nextUrl) {
+    if (hasSeen()) {
+      go(nextUrl);
+      return;
+    }
+
+    const overlay = ensureOverlay();
+    const video = document.getElementById(VIDEO_ID);
+    const source = document.getElementById(SRC_ID);
+    const skip = document.getElementById(SKIP_ID);
+    const sound = document.getElementById(SOUND_ID);
+    const tap = document.getElementById(TAP_ID);
+
+    if (!overlay || !video || !source || !skip || !tap) {
+      // If something fails, fallback to direct navigation
+      go(nextUrl);
+      return;
+    }
+
+    // Pause background hero video (if present)
+    const bg = document.getElementById("bgVideo");
+    try { bg && bg.pause && bg.pause(); } catch (_) {}
+
+    // Ensure latest source (in case you change getIntroSrc() later)
+    if (source.getAttribute("src") !== getIntroSrc()) {
+      source.setAttribute("src", getIntroSrc());
+      try { video.load(); } catch (_) {}
+    }
+
+    overlay.classList.remove("yhIntroHidden");
+    overlay.setAttribute("aria-hidden", "false");
+    document.documentElement.style.overflow = "hidden";
+    try{ document.body.classList.add("yhIntroGateActive"); }catch(_){}
+
+
+    // Start muted for autoplay policies
+    video.muted = false;
+    video.currentTime = 0;
+
+    const cleanupAndGo = () => {
+      markSeen();
+
+      // Keep overlay (black) covering the screen while navigating (prevents landing flash).
+      try {
+        overlay.classList.remove("yhIntroHidden");
+        overlay.classList.add("yhIntroLeaving");
+        overlay.setAttribute("aria-hidden", "false");
+        document.documentElement.style.overflow = "hidden";
+        document.body.classList.add("yhIntroGateActive");
+        // Force a layout/paint before navigation
+        void overlay.offsetHeight;
+      } catch (_) {}
+
+      const beforeHref = window.location.href;
+
+      // Safety: if navigation is blocked, restore the page after a short delay.
+      window.setTimeout(() => {
+        if (window.location.href === beforeHref) {
+          try {
+            overlay.classList.remove("yhIntroLeaving");
+            overlay.classList.add("yhIntroHidden");
+            overlay.setAttribute("aria-hidden", "true");
+            document.documentElement.style.overflow = "";
+            document.body.classList.remove("yhIntroGateActive");
+          } catch (_) {}
+        }
+      }, 3000);
+
+      // Navigate on the next paint to avoid flicker.
+      requestAnimationFrame(() => requestAnimationFrame(() => go(nextUrl)));
+    };
+
+
+    // Prevent duplicate listeners
+    skip.onclick = null;
+    if (sound) sound.onclick = null;
+    tap.onclick = null;
+
+    skip.onclick = (e) => {
+      e.preventDefault();
+      cleanupAndGo();
+    };
+
+    if (sound) {
+      sound.onclick = () => {
+        video.muted = !video.muted;
+        sound.textContent = video.muted ? "Sound" : "Mute";
+      };
+    }
+
+    // Ended -> go
+    const endedHandler = () => cleanupAndGo();
+    video.onended = endedHandler;
+
+    // If autoplay blocked -> show "Tap to play"
+    const tryPlay = async () => {
+      try {
+        await video.play();
+        tap.classList.add("yhIntroHidden");
+      } catch (_) {
+        tap.classList.remove("yhIntroHidden");
+      }
+    };
+
+    tap.onclick = async () => {
+      tap.classList.add("yhIntroHidden");
+      try { await video.play(); } catch (_) {}
+    };
+
+    // Esc -> skip
+    const escHandler = (e) => {
+      if (e.key === "Escape" && !overlay.classList.contains("yhIntroHidden")) {
+        cleanupAndGo();
+      }
+    };
+    window.addEventListener("keydown", escHandler, { once: true });
+
+    tryPlay();
+  }
+
+  function attachClickInterceptor() {
+    document.addEventListener("click", (e) => {
+      const a = e.target && e.target.closest ? e.target.closest("a") : null;
+      if (!a) return;
+
+      // Optional opt-out: <a data-no-intro ...>
+      if (a.hasAttribute("data-no-intro")) return;
+
+      const hrefAttr = (a.getAttribute("href") || "").trim();
+      const hrefResolved = (a.href || hrefAttr || "").trim();
+
+      // Check both raw and resolved href
+      if (!isMainLink(hrefAttr) && !isMainLink(hrefResolved)) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      openIntro(hrefResolved || hrefAttr);
+    }, true);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", attachClickInterceptor);
+  } else {
+    attachClickInterceptor();
+  }
+})();
+
