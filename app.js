@@ -643,9 +643,9 @@ hideOutputs();
   const CONFIG = {
     // NOTE: These must be PUBLICLY SERVED files in your site root (same folder as index.html)
     // Desktop (16:9)
-    introSrcDesktop: "https://video.wixstatic.com/video/2dee4d_f8f97962140641acaf3617d01ef66b2c/480p/mp4/file.mp4?fileUsed=false",
+    introSrcDesktop: "https://video.wixstatic.com/video/2dee4d_f8f97962140641acaf3617d01ef66b2c/1080p/mp4/file.mp4",
     // Mobile (9:16)
-    introSrcMobile: "https://video.wixstatic.com/video/2dee4d_f5bbbe56a6c642d6b4bfd8d548c7f0d8/480p/mp4/file.mp4?fileUsed=false",
+    introSrcMobile: "https://video.wixstatic.com/video/2dee4d_f5bbbe56a6c642d6b4bfd8d548c7f0d8/1080p/mp4/file.mp4",
 
     // If true, trailer runs only once per browser/device (stored in localStorage).
     // If false, trailer runs every time a user clicks a /main link from this page.
