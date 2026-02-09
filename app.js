@@ -645,7 +645,7 @@ hideOutputs();
     // Desktop (16:9)
     introSrcDesktop: "https://video.wixstatic.com/video/2dee4d_f8f97962140641acaf3617d01ef66b2c/1080p/mp4/file.mp4",
     // Mobile (9:16)
-    introSrcMobile: "https://video.wixstatic.com/video/2dee4d_f5bbbe56a6c642d6b4bfd8d548c7f0d8/1080p/mp4/file.mp4",
+    introSrcMobile: "https://video.wixstatic.com/video/2dee4d_f8f97962140641acaf3617d01ef66b2c/1080p/mp4/file.mp4",
 
     // If true, trailer runs only once per browser/device (stored in localStorage).
     // If false, trailer runs every time a user clicks a /main link from this page.
@@ -705,7 +705,8 @@ hideOutputs();
         display:flex; align-items:center; justify-content:center;
       }
       #${OVERLAY_ID}.yhIntroHidden{ display:none !important; }
-      #${VIDEO_ID}{ width:100%; height:100%; object-fit:cover; }
+      #${VIDEO_ID}{ width:100%; height:100%; display:block; background:#000; object-fit:contain; }
+    #${OVERLAY_ID}.yhIntroMobile #${VIDEO_ID}{ object-fit:cover; }
       .yhIntroControls{
         position:absolute; top:18px; right:18px;
         display:flex; gap:10px;
@@ -752,6 +753,7 @@ hideOutputs();
 
     overlay = document.createElement("div");
     overlay.id = OVERLAY_ID;
+    if (isMobileVisitor) overlay.classList.add("yhIntroMobile");
     overlay.className = "yhIntroHidden";
     overlay.setAttribute("aria-hidden", "true");
 
