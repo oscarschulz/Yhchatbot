@@ -439,6 +439,7 @@ goBtn?.addEventListener("click", runSearch);
 // ============================================
 
 // --- 0. DYNAMICALLY ADD SEARCH ICON TO HEADER ---
+// --- HEADER SEARCH & TOGGLE LOGIC (FIXED) ---
 (function injectHeaderSearch() {
   if (!personHead || !closeCard) return;
   if (document.getElementById("headerSearchBtn")) return;
@@ -482,10 +483,19 @@ goBtn?.addEventListener("click", runSearch);
     // 3. Reset Form
     if (connectForm) {
       connectForm.reset();
-      connectForm.classList.add("hidden"); 
-      connectForm.style.display = ""; 
+      connectForm.classList.add("hidden");
+      connectForm.style.display = "";
+
+      // FIXED: I-reset ang Submit Button status dito
+      const submitBtn = connectForm.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("is-loading");
+        // Ibalik sa orihinal na text (Submit Request)
+        submitBtn.textContent = submitBtn.dataset.originalText || "Submit Request";
+      }
     }
-    if (personMsg) personMsg.innerHTML = ""; 
+    if (personMsg) personMsg.innerHTML = "";
     
     // 4. Scroll back up
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1100,4 +1110,5 @@ hideOutputs();
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && overlay.classList.contains("isOpen")) closeOverlay(false);
   });
+  
 })();
