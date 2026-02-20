@@ -671,39 +671,58 @@ hideOutputs();
   const SOUND_ID = "yhIntroSound";
   const TAP_ID = "yhIntroTap";
 
+  // --- NEW: FULLSCREEN HELPERS ---
+  function requestFS(elem) {
+    try {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(() => {});
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen(); // Safari support
+      }
+    } catch (e) {}
+  }
+
+  function exitFS() {
+    try {
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    } catch (e) {}
+  }
+
   // Device-aware source selection (Desktop vs Mobile)
   function isMobileVisitor(){
-    // Modern Chromium (Client Hints)
     try{
       if (navigator.userAgentData && typeof navigator.userAgentData.mobile === "boolean") {
         return navigator.userAgentData.mobile;
       }
     }catch(_){}
-
-    // Viewport + input modality heuristics
     try{
       if (window.matchMedia) {
         if (window.matchMedia("(max-width: 820px)").matches) return true;
         if (window.matchMedia("(pointer: coarse)").matches && window.matchMedia("(hover: none)").matches) return true;
       }
     }catch(_){}
-
-    // Fallback UA sniff
     const ua = navigator.userAgent || "";
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobi/i.test(ua);
   }
 
   function getIntroSrc(){
-    // Debug overrides:
-    //  - ?intro=mobile  -> force mobile trailer
-    //  - ?intro=desktop -> force desktop trailer
     try{
       const p = new URLSearchParams(window.location.search);
       const forced = (p.get("intro") || "").toLowerCase();
       if (forced === "mobile") return CONFIG.introSrcMobile;
       if (forced === "desktop") return CONFIG.introSrcDesktop;
     }catch(_){}
-    return isMobileVisitor() ? CONFIG.introSrcMobile : CONFIG.introSrcDesktop;
+    
+    // LOGIC: Check orientation for mobile users
+    if (!isMobileVisitor()) return CONFIG.introSrcDesktop;
+    const isLandscape = window.matchMedia && window.matchMedia("(orientation: landscape)").matches;
+    return isLandscape ? CONFIG.introSrcDesktop : CONFIG.introSrcMobile;
   }
 
   function injectStyles() {
@@ -719,7 +738,7 @@ hideOutputs();
     #${OVERLAY_ID}.yhIntroMobile #${VIDEO_ID}{ object-fit:cover; }
       .yhIntroControls{
         position:absolute; top:18px; right:18px;
-        display:flex; gap:10px;
+        display:flex; gap:10px; z-index: 100002;
       }
       .yhIntroBtn{
         padding:12px 18px; border-radius:999px;
@@ -739,7 +758,7 @@ hideOutputs();
         border:none;
         background: rgba(0,0,0,0.35);
         color:#fff; font-weight:800; font-size:18px;
-        cursor:pointer;
+        cursor:pointer; z-index: 100003;
       }
       #${TAP_ID}.yhIntroHidden{ display:none !important; }
     
@@ -747,6 +766,25 @@ hideOutputs();
       body.yhIntroGateActive > :not(#${OVERLAY_ID}){ visibility:hidden !important; }
       #${OVERLAY_ID}.yhIntroLeaving{ background:#000; }
       #${OVERLAY_ID}.yhIntroLeaving #${VIDEO_ID}{ opacity:0; transition: opacity 180ms ease; }
+
+      /* PAUSE ICON STYLES */
+      #${OVERLAY_ID}.isPaused::after {
+        content: "▶";
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 80px;
+        color: rgba(255, 255, 255, 0.8);
+        pointer-events: none;
+        text-shadow: 0 0 30px rgba(0,0,0,0.5);
+        animation: pulsePlay 2s infinite;
+        z-index: 100001;
+      }
+      @keyframes pulsePlay {
+        0% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+        100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+      }
 `;
 
     const style = document.createElement("style");
@@ -763,7 +801,7 @@ hideOutputs();
 
     overlay = document.createElement("div");
     overlay.id = OVERLAY_ID;
-    if (isMobileVisitor) overlay.classList.add("yhIntroMobile");
+    if (isMobileVisitor()) overlay.classList.add("yhIntroMobile");
     overlay.className = "yhIntroHidden";
     overlay.setAttribute("aria-hidden", "true");
 
@@ -871,9 +909,10 @@ hideOutputs();
     const bg = document.getElementById("bgVideo");
     try { bg && bg.pause && bg.pause(); } catch (_) {}
 
-    // Ensure latest source (in case you change getIntroSrc() later)
-    if (source.getAttribute("src") !== getIntroSrc()) {
-      source.setAttribute("src", getIntroSrc());
+    // Ensure latest source upon opening
+    const idealSrc = getIntroSrc();
+    if (source.getAttribute("src") !== idealSrc) {
+      source.setAttribute("src", idealSrc);
       try { video.load(); } catch (_) {}
     }
 
@@ -882,6 +921,8 @@ hideOutputs();
     document.documentElement.style.overflow = "hidden";
     try{ document.body.classList.add("yhIntroGateActive"); }catch(_){}
 
+    // --- TRIGGER FULLSCREEN ON OPEN ---
+    requestFS(overlay);
 
     // Start muted for autoplay policies
     video.muted = true;
@@ -889,6 +930,9 @@ hideOutputs();
 
     const cleanupAndGo = () => {
       markSeen();
+      
+      // --- EXIT FULLSCREEN BEFORE NAVIGATING ---
+      exitFS();
 
       // Keep overlay (black) covering the screen while navigating (prevents landing flash).
       try {
@@ -920,19 +964,24 @@ hideOutputs();
       requestAnimationFrame(() => requestAnimationFrame(() => go(nextUrl)));
     };
 
-
-    // Prevent duplicate listeners
+    // --- RESET LISTENERS & UI ---
     skip.onclick = null;
     if (sound) sound.onclick = null;
     tap.onclick = null;
+    video.onended = null;
+    overlay.onclick = null; 
+    overlay.classList.remove("isPaused"); // Reset pause state
 
+    // --- BUTTON EVENTS ---
     skip.onclick = (e) => {
       e.preventDefault();
+      e.stopPropagation();
       cleanupAndGo();
     };
 
     if (sound) {
-      sound.onclick = () => {
+      sound.onclick = (e) => {
+        e.stopPropagation(); // Prevents click from pausing video
         video.muted = !video.muted;
         sound.textContent = video.muted ? "Sound" : "Mute";
       };
@@ -941,6 +990,64 @@ hideOutputs();
     // Ended -> go
     const endedHandler = () => cleanupAndGo();
     video.onended = endedHandler;
+
+    // --- TAP TO PAUSE/PLAY LOGIC ---
+    overlay.onclick = (e) => {
+        // Ignore clicks on buttons so they don't trigger pause
+        if (e.target.closest(".yhIntroBtn") || e.target === tap) return;
+
+        if (video.paused) {
+            video.play();
+            overlay.classList.remove("isPaused");
+        } else {
+            video.pause();
+            overlay.classList.add("isPaused");
+        }
+    };
+
+    // --- KEYBOARD CONTROLS (SPACEBAR) ---
+    const keyHandler = (e) => {
+        if (overlay.classList.contains("yhIntroHidden")) return;
+
+        if (e.code === "Space") {
+             e.preventDefault();
+             if (video.paused) { 
+                 video.play(); 
+                 overlay.classList.remove("isPaused"); 
+             } else { 
+                 video.pause(); 
+                 overlay.classList.add("isPaused"); 
+             }
+        }
+        if (e.key === "Escape") {
+             cleanupAndGo();
+        }
+    };
+    window.addEventListener("keydown", keyHandler);
+
+    // --- AUTO-SWAP VIDEO ON ROTATE ---
+    window.addEventListener("resize", () => {
+      if (overlay.classList.contains("yhIntroHidden")) return;
+      
+      const newIdealSrc = getIntroSrc();
+      if (source.getAttribute("src") !== newIdealSrc) {
+        const currentTime = video.currentTime;
+        const wasPlaying = !video.paused;
+        
+        source.setAttribute("src", newIdealSrc);
+        video.load();
+        
+        const onMeta = () => {
+            video.currentTime = currentTime;
+            if (wasPlaying) {
+                video.play().catch(()=>{});
+                overlay.classList.remove("isPaused");
+            }
+            video.removeEventListener("loadedmetadata", onMeta);
+        };
+        video.addEventListener("loadedmetadata", onMeta);
+      }
+    });
 
     // If autoplay blocked -> show "Tap to play"
     const tryPlay = async () => {
@@ -952,18 +1059,12 @@ hideOutputs();
       }
     };
 
-    tap.onclick = async () => {
+    tap.onclick = async (e) => {
+      e.stopPropagation();
+      requestFS(overlay); // --- FALLBACK: Trigger fullscreen if user had to tap
       tap.classList.add("yhIntroHidden");
       try { await video.play(); } catch (_) {}
     };
-
-    // Esc -> skip
-    const escHandler = (e) => {
-      if (e.key === "Escape" && !overlay.classList.contains("yhIntroHidden")) {
-        cleanupAndGo();
-      }
-    };
-    window.addEventListener("keydown", escHandler, { once: true });
 
     tryPlay();
   }
@@ -1112,3 +1213,67 @@ hideOutputs();
   });
   
 })();
+// --- NATIVE SHARE FEATURE ---
+const shareBtn = document.getElementById("nativeShareBtn");
+if (shareBtn) {
+  shareBtn.addEventListener("click", async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Young Hustlers',
+          text: 'Join the network. Connect with the bold and driven.',
+          url: window.location.href
+        });
+      } catch (err) {
+        console.log('Share canceled:', err);
+      }
+    } else {
+      // Fallback para sa PC na walang native share (Copy to Clipboard)
+      navigator.clipboard.writeText(window.location.href);
+      // Pwede kang maglagay ng simpleng alert dito o toast notification
+      alert("Link copied to clipboard!"); 
+    }
+  });
+}
+// --- VOICE SEARCH FEATURE ---
+const voiceBtn = document.getElementById("voiceBtn");
+const searchInput = document.getElementById("q");
+
+if (voiceBtn && searchInput) {
+  // Check kung supported ng browser (Chrome/Android usually meron)
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false; // Stop after one sentence
+    recognition.lang = "en-US";     // English input
+
+    voiceBtn.addEventListener("click", () => {
+      // Haptic feedback (Vibrate)
+      if (navigator.vibrate) navigator.vibrate(50);
+      
+      recognition.start();
+    });
+
+    recognition.onstart = () => {
+      voiceBtn.classList.add("listening");
+      searchInput.placeholder = "Listening...";
+    };
+
+    recognition.onend = () => {
+      voiceBtn.classList.remove("listening");
+      searchInput.placeholder = 'Try: "Amazon employee"...';
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      searchInput.value = transcript;
+      
+      // Auto-search pagkatapos magsalita (Optional)
+      runSearch(); 
+    };
+  } else {
+    // Kung hindi supported (e.g., Firefox Desktop), itago nalang ang button
+    voiceBtn.style.display = "none";
+  }
+}

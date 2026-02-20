@@ -53,13 +53,24 @@
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
+            
             <input
               id="q"
               type="text"
               placeholder='Try: "Amazon employee", "Politician in California"...'
               autocomplete="off"
             />
+
+            <button id="voiceBtn" type="button" aria-label="Voice Search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+            </button>
           </div>
+
           <button id="goBtn" class="goBtn" type="button" aria-label="Search">
             <span class="goIcon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -188,6 +199,16 @@
               <svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
             </a>
 
+            <button id="nativeShareBtn" class="sLink" style="background:none; border:none; cursor:pointer;" data-tooltip="Share Network">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+            </button>
+
           </nav>
         </div>
       </div>
@@ -201,7 +222,6 @@
   <script src="app.js"></script>
   <script src="toggle.js"></script>
 </body>
-<!-- Trailer Overlay (opens when user clicks “Explore Young Hustlers”) -->
 <div id="yhTrailerOverlay" class="yhTrailerOverlay" aria-hidden="true">
   <button id="yhTrailerClose" class="yhTrailerClose" type="button" aria-label="Close trailer">✕</button>
   <video id="yhTrailerVideo" class="yhTrailerVideo" playsinline preload="auto"></video>

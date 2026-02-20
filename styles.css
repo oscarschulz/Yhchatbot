@@ -156,7 +156,9 @@ body:has(#personBox:not(.hidden)) .top {
 }
 
 #q {
-  width: 100%; height: 60px; padding: 0 15px 0 50px; border-radius: 16px;
+  width: 100%; height: 60px; 
+  padding: 0 50px 0 50px; 
+  border-radius: 16px;
   border: 1px solid rgba(255,255,255,0.15); 
   background: rgba(0,0,0,0.5);
   color: #fff; font-size: 16px; /* 16px prevents iOS zoom */
@@ -164,6 +166,47 @@ body:has(#personBox:not(.hidden)) .top {
   font-weight: 500; font-family: 'Montserrat', sans-serif;
 }
 #q::placeholder { color: rgba(255,255,255,0.5); font-weight: 400; font-size: 14px; }
+
+/* --- VOICE SEARCH BUTTON STYLES --- */
+#voiceBtn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+#voiceBtn:hover {
+  color: var(--focus);
+  background: rgba(255,255,255,0.1);
+}
+
+#voiceBtn svg {
+  width: 20px;
+  height: 20px;
+}
+
+#voiceBtn.listening {
+  color: #ff4b4b;
+  animation: pulseMic 1.5s infinite;
+}
+
+@keyframes pulseMic {
+  0% { box-shadow: 0 0 0 0 rgba(255, 75, 75, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 75, 75, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 75, 75, 0); }
+}
 
 .goBtn {
   height: 60px; width: 60px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
@@ -360,28 +403,25 @@ body.hero-text .headline, body.hero-text .subhead { animation: yhFadeIn 0.8s eas
 
 /* =========================
    MOBILE / RESPONSIVE (768px & BELOW)
-   FIXED: SCROLL ENABLED (Auto-Detect)
    ========================= */
 @media (max-width: 768px) {
   
   html, body {
-    /* CHANGED: Ginawang 'auto' para pwede mag-scroll pag kailangan */
     height: 100dvh; 
     overflow-x: hidden; 
     overflow-y: auto; 
-    -webkit-overflow-scrolling: touch; /* Smooth scroll sa iPhone */
+    -webkit-overflow-scrolling: touch; 
   }
 
   .wrap {
-    min-height: 100dvh; /* Sisiguraduhing puno ang screen */
-    height: auto;       /* Hahaba kapag may search results */
+    min-height: 100dvh; 
+    height: auto;       
     padding: 10px 20px; 
     display: flex;
     flex-direction: column;
     justify-content: space-between; 
   }
 
-  /* 1. TOP SECTION */
   .top {
     flex: 1;
     display: flex;
@@ -392,7 +432,6 @@ body.hero-text .headline, body.hero-text .subhead { animation: yhFadeIn 0.8s eas
     gap: 15px;
   }
 
-  /* 2. TYPOGRAPHY */
   .headline { 
     font-size: clamp(28px, 8vw, 34px); 
     line-height: 1.1; 
@@ -407,7 +446,6 @@ body.hero-text .headline, body.hero-text .subhead { animation: yhFadeIn 0.8s eas
     margin-bottom: 5px; 
   }
 
-  /* 3. SEARCH CARD */
   .searchCard { 
     width: 100%; 
     margin-top: 5px; 
@@ -416,7 +454,6 @@ body.hero-text .headline, body.hero-text .subhead { animation: yhFadeIn 0.8s eas
   #q { font-size: 16px; height: 56px; }
   .goBtn { height: 56px; width: 56px; }
 
-  /* 4. FOOTER (NO LOGO) */
   .footer {
     flex-shrink: 0;
     padding: 15px 0 25px;
@@ -430,7 +467,7 @@ body.hero-text .headline, body.hero-text .subhead { animation: yhFadeIn 0.8s eas
     gap: 0; 
   }
 
-  .fLogo { display: none !important; } /* TANGGAL LOGO */
+  .fLogo { display: none !important; }
 
   .footerSocials { 
     gap: 30px; 
@@ -451,7 +488,6 @@ body.hero-text .headline, body.hero-text .subhead { animation: yhFadeIn 0.8s eas
     letter-spacing: 1px;
   }
 
-  /* 5. FIX FOR SEARCH RESULTS (Force layout change) */
   body:has(.list:not(.hidden)) .wrap,
   body:has(#personBox:not(.hidden)) .wrap {
     height: auto !important;
@@ -466,29 +502,22 @@ body.hero-text .headline, body.hero-text .subhead { animation: yhFadeIn 0.8s eas
     justify-content: flex-start;
   }
 
-  /* Small Screens Tweak */
   @media (max-height: 700px) {
     .top { padding-top: 12vh !important; }
   }
 
-
-  /* =========================================
-     SPECIFIC FIX FOR SHORT SCREENS (e.g. 375x667)
-     Liliit ang gaps kapag siksikan na sa screen height.
-     ========================================= */
   @media (max-height: 700px) {
     .top { 
-      padding-top: 12vh !important; /* Bawasan konti para di masyadong tulak pababa */
+      padding-top: 12vh !important; 
       gap: 8px; 
     }
     .headline { font-size: 28px; }
     .subhead { font-size: 14px; }
-    .fLogo { height: 60px; } /* Pinaliit konti sa 375x667 para makita ang icons */
+    .fLogo { height: 60px; } 
     .footerMain { gap: 8px; }
     .exploreRow { margin-top: 10px; }
   }
 
-  /* --- SCROLL LOGIC (Enabled only when searching) --- */
   body:has(.list:not(.hidden)),
   body:has(#personBox:not(.hidden)) {
     height: auto !important;
@@ -508,7 +537,23 @@ body.hero-text .headline, body.hero-text .subhead { animation: yhFadeIn 0.8s eas
     padding-top: 40px !important;
     justify-content: flex-start;
   }
+
+  /* --- TRAILER MOBILE ADJUSTMENTS --- */
+  .trailerControls {
+    bottom: 80px; 
+    right: 50%;
+    transform: translateX(50%); 
+    width: max-content;
+  }
+
+  /* FIXED: Portrait orientation becomes FULL SCREEN cover */
+  @media (orientation: portrait) {
+    .yhTrailerVideo {
+      object-fit: cover !important; 
+    }
+  }
 }
+
 /* ====================================
    SCENERY SWITCHER
    ==================================== */
@@ -723,6 +768,7 @@ html.yhNoScroll, body.yhNoScroll {
   overflow: hidden !important; height: 100% !important;
 }
 
+/* EXPLORE TRAILER OVERLAY */
 .yhTrailerOverlay {
   position: fixed; inset: 0;
   width: 100vw; height: 100vh; height: 100dvh;
@@ -734,7 +780,8 @@ html.yhNoScroll, body.yhNoScroll {
 .yhTrailerOverlay.isOpen { display: flex; }
 
 .yhTrailerVideo {
-  width: 100%; height: 100%; object-fit: contain; background: #000;
+  width: 100%; height: 100%; background: #000;
+  object-fit: contain; /* Default for Desktop & Landscape Mobile */
 }
 
 .yhTrailerClose {
@@ -746,19 +793,62 @@ html.yhNoScroll, body.yhNoScroll {
   color: #fff; font-size: 18px; cursor: pointer;
   z-index: 1000000;
 }
+
+/* --- TRAILER CONTROLS (Sound & Skip) --- */
+.trailerControls {
+  position: absolute;
+  bottom: 30px;
+  right: 20px;
+  display: flex;
+  gap: 15px;
+  z-index: 1000001;
+}
+
+.tBtn {
+  padding: 12px 24px;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.tBtn:hover {
+  background: #fff;
+  color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+}
+
+.tBtnGhost {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.2);
+  opacity: 0.8;
+}
+
+.tBtnGhost:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  opacity: 1;
+}
+
 /* ============================================================
    ULTRA-HIGH RESOLUTION ADJUSTMENTS (2K & 4K)
-   Targeting Jerwin's UI/UX requirements for Young Hustlers.
    ============================================================ */
-
-/* 1. FOR 2K RESOLUTIONS & ULTRAWIDE (e.g., 2560x1080) */
 @media (min-width: 1921px) {
   .wrap {
-    max-width: 1800px; /* Mas malapad na container para sa 2K */
+    max-width: 1800px;
   }
 
   .headline {
-    font-size: 90px; /* Pinalaki para sa cinematic feel */
+    font-size: 90px;
     letter-spacing: -2px;
   }
 
@@ -768,7 +858,7 @@ html.yhNoScroll, body.yhNoScroll {
   }
 
   .searchCard {
-    width: min(1200px, 90%); /* Mas malapad na search bar */
+    width: min(1200px, 90%); 
     padding: 20px;
     border-radius: 30px;
   }
@@ -784,7 +874,7 @@ html.yhNoScroll, body.yhNoScroll {
   }
 
   .fLogo {
-    height: 100px; /* Mas visible na logo sa malaking screen */
+    height: 100px; 
   }
 
   .footerSocials .sLink {
@@ -793,7 +883,6 @@ html.yhNoScroll, body.yhNoScroll {
   }
 }
 
-/* 2. FOR 4K RESOLUTIONS (3840x2160) */
 @media (min-width: 3000px) {
   .wrap {
     max-width: 2400px;
@@ -805,7 +894,7 @@ html.yhNoScroll, body.yhNoScroll {
   }
 
   .headline {
-    font-size: 140px; /* Massive text for 4K visibility */
+    font-size: 140px; 
     text-shadow: 0 10px 40px rgba(0,0,0,0.8);
   }
 
@@ -846,13 +935,12 @@ html.yhNoScroll, body.yhNoScroll {
     height: 45px;
   }
 
-  /* Footer Scaling for 4K */
   .footerMain {
     padding-bottom: 40px;
   }
 
   .fLogo {
-    height: 150px; /* Malaking logo para sa 4K */
+    height: 150px; 
   }
 
   .footerSocials {
