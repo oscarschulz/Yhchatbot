@@ -176,7 +176,13 @@ function safeScrollTo(el, offset = 16){
     try{ el.scrollIntoView({ behavior: "smooth", block: "start" }); }catch(__){}
   }
 }
+function syncResponsiveState() {
+  const hasListVisible = !!(list && !list.classList.contains("hidden"));
+  const hasPersonVisible = !!(personBox && !personBox.classList.contains("hidden"));
+  const hasActiveOutput = hasListVisible || hasPersonVisible;
 
+  document.body.classList.toggle("search-active", hasActiveOutput);
+}
 function normalize(s) {
   return (s || "").toString().toLowerCase().trim();
 }
@@ -277,8 +283,10 @@ function hideOutputs() {
 
   if (personBox) {
     personBox.classList.add("hidden");
-    personBox.classList.remove("minimized"); // Reset minimized so it opens fresh next time
+    personBox.classList.remove("minimized");
   }
+
+  syncResponsiveState();
 }
 
 function looksLikeSpecificPersonQuery(raw) {
@@ -334,8 +342,9 @@ function showPersonFlow(raw) {
 
   // SHOW THE BOX and RESET STATE
   // FIX: Siguraduhin na visible ang box at hindi minimized
-  personBox.classList.remove("hidden");
-  personBox.classList.remove("minimized"); 
+    personBox.classList.remove("hidden");
+  personBox.classList.remove("minimized");
+  syncResponsiveState(); 
 
   if (connectForm) {
     connectForm.reset();
@@ -399,7 +408,10 @@ function runSearch() {
   if (personBox) personBox.classList.add("hidden");
 
   if (!scored.length) {
-    if (list) { list.classList.add("hidden"); list.innerHTML = ""; }
+    if (list) {
+      list.classList.add("hidden");
+      list.innerHTML = "";
+    }
     if (empty) {
       empty.classList.remove("hidden");
       empty.textContent = "No matches found.";
@@ -409,18 +421,22 @@ function runSearch() {
     if (list) list.classList.remove("hidden");
     render(scored);
   }
+
+  syncResponsiveState();
 }
 
 function handleTyping() {
   const raw = (q?.value || "").trim();
   if (!raw) { hideOutputs(); return; }
-  
+
   if (personSearchTimeout) clearTimeout(personSearchTimeout);
   if (personDotsInterval) clearInterval(personDotsInterval);
 
   if (personBox) personBox.classList.add("hidden");
   if (list) list.classList.add("hidden");
   if (empty) empty.classList.add("hidden");
+
+  syncResponsiveState();
 }
 
 // Events
@@ -479,6 +495,7 @@ goBtn?.addEventListener("click", runSearch);
     personBox.classList.add("hidden");
     personBox.classList.remove("minimized");
     personBox.dataset.mode = "";
+    syncResponsiveState();
     
     // 3. Reset Form
     if (connectForm) {
@@ -591,10 +608,12 @@ if (connectForm) {
       const sh = document.getElementById("heroSubhead");
       const sc = document.getElementById("searchCard");
       const er = document.getElementById("exploreRow");
-      if (h1) h1.classList.add("hidden");
+        if (h1) h1.classList.add("hidden");
       if (sh) sh.classList.add("hidden");
       if (sc) sc.classList.add("hidden");
       if (er) er.classList.add("hidden");
+
+      syncResponsiveState();
 
       if (personMsg) {
         const safeEmail = (data.email || "").replace(/</g, "&lt;");
@@ -643,6 +662,7 @@ if (connectForm) {
 
 // Initial UI state
 hideOutputs();
+syncResponsiveState();
 
 // -------------------------------------------------------------
 // INTRO VIDEO GATE (Landing -> /main)
@@ -1117,8 +1137,8 @@ hideOutputs();
     const y = window.scrollY || document.documentElement.scrollTop || 0;
     document.body.dataset.yhScrollY = String(y);
 
-    document.documentElement.classList.add("yhNoScroll");
-    document.body.classList.add("yhNoScroll");
+        document.documentElement.classList.add("yhNoScroll", "trailer-open");
+    document.body.classList.add("yhNoScroll", "trailer-open");
 
     document.body.style.position = "fixed";
     document.body.style.top = `-${y}px`;
@@ -1130,9 +1150,8 @@ hideOutputs();
   const unlockScroll = () => {
     const y = parseInt(document.body.dataset.yhScrollY || "0", 10);
 
-    document.documentElement.classList.remove("yhNoScroll");
-    document.body.classList.remove("yhNoScroll");
-
+    document.documentElement.classList.remove("yhNoScroll", "trailer-open");
+    document.body.classList.remove("yhNoScroll", "trailer-open");
     document.body.style.position = "";
     document.body.style.top = "";
     document.body.style.left = "";

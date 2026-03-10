@@ -460,11 +460,12 @@ body.hero-text .headline, body.hero-text .subhead { animation: yhFadeIn 0.8s eas
     width: 100%;
   }
 
-  .footerMain { 
+    .footerMain { 
     display: flex; 
     flex-direction: column !important; 
     align-items: center !important;   
     gap: 0; 
+    text-align: center;
   }
 
   .fLogo { display: none !important; }
@@ -501,7 +502,17 @@ body.hero-text .headline, body.hero-text .subhead { animation: yhFadeIn 0.8s eas
     padding-top: 40px !important;
     justify-content: flex-start;
   }
+  body.search-active .wrap {
+    height: auto !important;
+    justify-content: flex-start;
+    padding-bottom: 60px;
+  }
 
+  body.search-active .top {
+    flex: 0 0 auto;
+    padding-top: 40px !important;
+    justify-content: flex-start;
+  }
   @media (max-height: 700px) {
     .top { padding-top: 12vh !important; }
   }
@@ -537,7 +548,22 @@ body.hero-text .headline, body.hero-text .subhead { animation: yhFadeIn 0.8s eas
     padding-top: 40px !important;
     justify-content: flex-start;
   }
+  body.search-active {
+    height: auto !important;
+    overflow-y: auto !important;
+  }
 
+  body.search-active .wrap {
+    height: auto !important;
+    justify-content: flex-start;
+    padding-bottom: 60px;
+  }
+
+  body.search-active .top {
+    flex: 0 0 auto;
+    padding-top: 40px !important;
+    justify-content: flex-start;
+  }
   /* --- TRAILER MOBILE ADJUSTMENTS --- */
   .trailerControls {
     bottom: 80px; 
@@ -955,5 +981,131 @@ html.yhNoScroll, body.yhNoScroll {
   .footerBottom {
     font-size: 20px;
     letter-spacing: 4px;
+  }
+}
+body:has(.list:not(.hidden)) .top,
+body:has(#personBox:not(.hidden)) .top {
+  flex: 0 0 auto; 
+  justify-content: flex-start; 
+  padding-top: 60px; 
+  padding-bottom: 20px;
+  min-height: auto; 
+}
+body.search-active .wrap {
+  justify-content: flex-start;
+}
+
+body.search-active .top {
+  flex: 0 0 auto;
+  justify-content: flex-start;
+  padding-top: 60px;
+  padding-bottom: 20px;
+  min-height: auto;
+}
+
+body.search-active .footer {
+  margin-top: 24px;
+}
+
+html.trailer-open,
+body.trailer-open {
+  overflow: hidden !important;
+}
+
+@media (max-width: 1280px) {
+  .wrap {
+    max-width: 1080px;
+    padding: 0 20px 32px;
+  }
+
+  .top {
+    padding-top: clamp(56px, 8vh, 96px);
+    padding-bottom: 40px;
+    gap: 18px;
+  }
+
+  .headline {
+    font-size: clamp(32px, 5.2vw, 60px);
+  }
+
+  .subhead {
+    max-width: 640px;
+    font-size: 17px;
+  }
+
+  .searchCard {
+    width: min(760px, 100%);
+  }
+}
+
+@media (max-width: 1024px) {
+  .wrap {
+    max-width: 100%;
+    padding: 0 18px 28px;
+  }
+
+  .top {
+    padding-top: clamp(44px, 7vh, 72px);
+    padding-bottom: 28px;
+    gap: 16px;
+  }
+
+  .headline {
+    font-size: clamp(30px, 5vw, 48px);
+  }
+
+  .subhead {
+    max-width: 560px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .searchCard {
+    width: min(680px, 100%);
+    margin-top: 12px;
+  }
+
+  .grid2 {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .field,
+  .grid2 {
+    margin-bottom: 18px;
+  }
+
+  .footerMain {
+    gap: 16px;
+  }
+
+  .footerSocials {
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-height: 900px) and (min-width: 769px) {
+  .wrap {
+    min-height: auto;
+  }
+
+  .top {
+    padding-top: clamp(40px, 6vh, 72px);
+    padding-bottom: 20px;
+    gap: 14px;
+  }
+
+  .content {
+    padding-bottom: 72px;
+  }
+
+  .exploreRow {
+    margin-top: 18px;
+  }
+
+  .footer {
+    padding: 16px 0;
   }
 }
