@@ -183,6 +183,56 @@ function syncResponsiveState() {
 
   document.body.classList.toggle("search-active", hasActiveOutput);
 }
+function isTrailerOpen() {
+  const overlay = document.getElementById("yhTrailerOverlay");
+  return !!(overlay && overlay.classList.contains("isOpen"));
+}
+
+function canScrollInside(el) {
+  if (!el) return false;
+  return el.scrollHeight > el.clientHeight + 2;
+}
+
+(function initForegroundWheelScrollBridge() {
+  const zones = [
+    document.querySelector(".wrap"),
+    document.querySelector(".scenery-ui")
+  ].filter(Boolean);
+
+  if (!zones.length) return;
+
+  const relayWheelToPage = (e) => {
+    if (isTrailerOpen()) return;
+    if (document.documentElement.classList.contains("yhNoScroll")) return;
+    if (document.body.classList.contains("yhNoScroll")) return;
+
+    const target = e.target;
+
+    // Huwag galawin kapag nasa modal / popup
+    if (target && target.closest && target.closest(".swal2-container")) return;
+
+    // Huwag galawin kapag textarea na may sariling scroll
+    const textarea = target && target.closest ? target.closest("textarea") : null;
+    if (textarea && canScrollInside(textarea)) return;
+
+    // Ito ang mismong fix:
+    // kahit nasa search/input/buttons/cards ang cursor,
+    // ipasa ang wheel sa page scroll.
+    e.preventDefault();
+    window.scrollBy({
+      top: e.deltaY,
+      left: 0,
+      behavior: "auto"
+    });
+  };
+
+  zones.forEach((zone) => {
+    zone.addEventListener("wheel", relayWheelToPage, {
+      passive: false,
+      capture: true
+    });
+  });
+})();
 function normalize(s) {
   return (s || "").toString().toLowerCase().trim();
 }

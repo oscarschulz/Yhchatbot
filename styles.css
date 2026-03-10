@@ -1109,3 +1109,22 @@ body.trailer-open {
     padding: 16px 0;
   }
 }
+/* ====================================
+   FOREGROUND SCROLL PASS-THROUGH
+   Makes vertical scrolling work even
+   when cursor is over the centered UI.
+   ==================================== */
+.wrap,
+.top,
+.content,
+.searchCard,
+.exploreRow,
+.card,
+.cardBody,
+.list,
+.empty,
+.footer,
+.scenery-ui {
+  touch-action: pan-y;
+  overscroll-behavior: auto;
+}
